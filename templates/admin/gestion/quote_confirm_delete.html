@@ -1,0 +1,36 @@
+{% extends layout_path %}
+{% load i18n %}
+{% block title %}Supprimer la demande de devis – Back-office{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h4 class="fw-bold mb-0">Supprimer la demande de devis</h4>
+  <a href="{% url 'gestion:quote-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card border-danger">
+      <div class="card-body text-center py-5">
+        <div class="mb-3">
+          <span class="badge bg-label-danger p-3 rounded-circle" style="width: 64px; height: 64px; display: inline-flex; align-items: center; justify-content: center;">
+            <i class="ti ti-trash" style="font-size: 1.75rem;"></i>
+          </span>
+        </div>
+        <h5 class="fw-bold mb-2">Confirmer la suppression</h5>
+        <p class="text-muted mb-1">Vous êtes sur le point de supprimer la demande :</p>
+        <p class="fw-semibold mb-1">{{ quote.subject }}</p>
+        <p class="text-muted small mb-4">
+          Client : {{ quote.client.get_full_name|default:quote.client.username }} &bull;
+          Reçue le {{ quote.created_at|date:"d/m/Y" }}
+        </p>
+        <p class="text-danger small mb-4">Cette action est irréversible.</p>
+        <form method="post" class="d-flex justify-content-center gap-3">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger"><i class="ti ti-trash me-1"></i>Supprimer définitivement</button>
+          <a href="{% url 'gestion:quote-list' %}" class="btn btn-outline-secondary">Annuler</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

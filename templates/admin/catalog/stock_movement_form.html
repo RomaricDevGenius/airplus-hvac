@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p><strong>Produit :</strong> {{ product.reference }} – {{ product.designation }}</p>
+<p><strong>Stock actuel :</strong> {{ product.quantity }}</p>
+
+<form method="post" id="stock-movement-form">
+  {% csrf_token %}
+  <fieldset class="module aligned">
+    <div class="form-row">
+      <label for="id_movement_type">Type de mouvement</label>
+      <select name="movement_type" id="id_movement_type" required>
+        <option value="in">Entrée</option>
+        <option value="out" selected>Sortie</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="id_quantity">Quantité</label>
+      <input type="number" name="quantity" id="id_quantity" min="1" required value="1">
+    </div>
+    <div class="form-row">
+      <label for="id_note">Motif / note</label>
+      <input type="text" name="note" id="id_note" maxlength="255" placeholder="Ex. : Vente, Réception, Correction...">
+    </div>
+  </fieldset>
+  <div class="submit-row">
+    <input type="submit" value="Enregistrer le mouvement" class="default">
+    <a href="{% url 'admin:catalog_product_changelist' %}" class="button cancel-link">Annuler</a>
+  </div>
+</form>
+{% endblock %}

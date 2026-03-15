@@ -1,0 +1,20 @@
+{% extends layout_path %}
+{% load i18n %}
+
+{% block title %}Supprimer le client – Back-office{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h4 class="mb-3">Supprimer le client ?</h4>
+    <p class="mb-2"><strong>{{ client.user.get_full_name|default:client.user.username }}</strong> – {{ client.user.email }}</p>
+    {% if client.company_name %}<p class="mb-2 text-muted">{{ client.company_name }}</p>{% endif %}
+    <p class="text-danger mb-4">Cette action est irréversible. Le compte utilisateur et toutes les données associées seront supprimés.</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Supprimer</button>
+      <a href="{% url 'gestion:client-detail' client.pk %}" class="btn btn-outline-secondary">Annuler</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

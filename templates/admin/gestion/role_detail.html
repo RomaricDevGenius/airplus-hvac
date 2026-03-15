@@ -1,0 +1,83 @@
+{% extends layout_path %}
+{% load i18n %}
+{% block title %}Rôle – {{ role.name }} – Back-office{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">{{ role.name }}</h4>
+    <small class="text-muted">{{ role.permissions.count }} permission{{ role.permissions.count|pluralize }}</small>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{% url 'gestion:role-update' role.pk %}" class="btn btn-primary"><i class="ti ti-edit me-1"></i>Modifier</a>
+    <a href="{% url 'gestion:role-delete' role.pk %}" class="btn btn-outline-danger"><i class="ti ti-trash me-1"></i>Supprimer</a>
+    <a href="{% url 'gestion:role-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+  </div>
+</div>
+
+{% if messages %}
+{% for msg in messages %}
+<div class="alert alert-{{ msg.tags }} alert-dismissible fade show mb-3" role="alert">
+  <i class="ti ti-circle-check me-1"></i>{{ msg }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0"><i class="ti ti-shield-check me-1"></i>Permissions attribuées</h6>
+      </div>
+      <div class="card-body">
+        {% if permissions_grouped %}
+        {% for section_name, perm_labels in permissions_grouped %}
+        <div class="mb-4">
+          <h6 class="text-uppercase text-muted small fw-semibold mb-2 pb-1 border-bottom">{{ section_name }}</h6>
+          <div class="d-flex flex-wrap gap-2">
+            {% for label in perm_labels %}
+            <span class="badge bg-label-primary py-2 px-3" style="font-size: 0.78rem; font-weight: 500;">
+              <i class="ti ti-check me-1"></i>{{ label }}
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="text-muted mb-0"><i class="ti ti-info-circle me-1"></i>Aucune permission assignée à ce rôle.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0"><i class="ti ti-users me-1"></i>Personnel avec ce rôle</h6>
+      </div>
+      <div class="card-body p-0">
+        {% if users_with_role %}
+        <ul class="list-group list-group-flush">
+          {% for u in users_with_role %}
+          <li class="list-group-item d-flex align-items-center gap-2 py-2 px-3">
+            <div class="avatar avatar-sm bg-label-secondary rounded-circle" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; flex-shrink: 0;">
+              {{ u.get_full_name|default:u.email|slice:":1"|upper }}
+            </div>
+            <div style="min-width: 0">
+              <div class="fw-semibold text-truncate" style="font-size: 0.875rem;">{{ u.get_full_name|default:"–" }}</div>
+              <div class="text-muted text-truncate" style="font-size: 0.75rem;">{{ u.email }}</div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="px-3 py-4 text-center text-muted" style="font-size: 0.875rem;">
+          <i class="ti ti-user-off d-block mb-1" style="font-size: 1.5rem;"></i>
+          Aucun membre du personnel n'a ce rôle.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

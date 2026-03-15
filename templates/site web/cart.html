@@ -1,0 +1,323 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panier – Demande de devis | AIRPLUS HVAC</title>
+    <link rel="icon" href="{% static 'site/img/logo.jpg' %}" type="image/jpeg" />
+    <link rel="stylesheet" href="{% static 'site/css/bootstrap.min.css' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+      :root{--primary:#1060A0;--primary-dark:#0a4d85;--accent:#2196F3;--text:#2c2c2c;--text-light:#606060;--border:#d0e4f7;}
+      *{box-sizing:border-box;}
+      html{font-size:16px;}
+      body{font-family:'Inter',sans-serif;background:#f5f7fa;color:#202124;margin:0;padding:0;overflow-x:hidden;line-height:1.55;}
+      /* TOP BAR + NAVBAR copiés de la home */
+      .top-info-bar{background:#1060A0;padding:9px 0;font-size:.82rem;color:#fff;z-index:1000;position:relative;border-bottom:2px solid #2196F3;}
+      .top-info-bar .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+      .top-info-bar .info-left,.top-info-bar .info-right{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+      .top-info-bar .info-item{display:flex;align-items:center;gap:6px;opacity:.95;}
+      .top-info-bar .info-item i{font-size:.9rem;color:#fff;}
+      .top-info-bar a{color:#fff;text-decoration:none;transition:opacity .2s;}
+      .top-info-bar a:hover{opacity:.85;}
+      .top-auth{display:flex;align-items:center;gap:10px;}
+      .top-auth .auth-user-pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.4);padding:3px 9px;color:#fff;white-space:nowrap;}
+      .top-auth .auth-user-pill i{font-size:.85rem;color:#bbf7d0;}
+      .top-auth a{color:#fff;text-decoration:none;font-weight:500;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.4);transition:all .2s;font-size:.8rem;}
+      .top-auth a:hover{background:rgba(255,255,255,.15);}
+      .main-navbar{position:sticky;top:0;z-index:999;background:#ffffff;box-shadow:0 2px 20px rgba(0,0,0,.1);padding:8px 0;transition:all .3s;}
+      .main-navbar>.container{display:flex;align-items:center;justify-content:space-between;gap:18px;}
+      .navbar-brand-custom{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0;}
+      .navbar-brand-custom img{height:44px;width:auto;}
+      .brand-text{font-family:'Montserrat',sans-serif;font-weight:800;font-size:.98rem;color:#1060A0;line-height:1.15;}
+      .brand-text small{display:block;font-size:.58rem;font-weight:500;color:#606060;letter-spacing:1.5px;text-transform:uppercase;}
+      .navbar-nav-custom{display:flex;list-style:none;margin:0;padding:0;align-items:center;gap:4px;flex:1;justify-content:flex-end;}
+      .nav-link-custom{position:relative;text-decoration:none;color:#2c2c2c;font-weight:500;font-size:.9rem;padding:7px 14px;transition:color .3s;}
+      .nav-link-custom::after{content:'';position:absolute;bottom:0;left:14px;right:14px;height:2px;background:#1060A0;transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+      .nav-link-custom:hover,.nav-link-custom.active{color:#1060A0;}
+      .nav-link-custom:hover::after,.nav-link-custom.active::after{transform:scaleX(1);}
+      .btn-nav-cta{background:#2196F3;color:#fff!important;padding:9px 20px!important;border-radius:4px;font-weight:600;font-size:.88rem;text-decoration:none;display:flex;align-items:center;gap:7px;box-shadow:0 2px 8px rgba(33,150,243,.35);transition:all .3s;letter-spacing:.3px;}
+      .btn-nav-cta:hover{background:#1060A0;box-shadow:0 4px 14px rgba(16,96,160,.45);color:#fff!important;}
+      .nav-cart-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;border:1px solid #d0e4f7;background:#f4f6f9;color:#1060A0;cursor:pointer;text-decoration:none;transition:all .25s;flex-shrink:0;margin-left:8px;}
+      .nav-cart-btn:hover{background:#1060A0;color:#fff;border-color:#1060A0;box-shadow:0 3px 10px rgba(16,96,160,.35);}
+      .nav-cart-count{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:999px;background:#e53935;color:#fff;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #fff;}
+      .mobile-toggle{display:none;background:none;border:none;font-size:1.5rem;color:#1060A0;cursor:pointer;padding:4px;}
+      @media(max-width:991px){
+        .mobile-toggle{display:block;}
+        .navbar-nav-custom{display:none;position:absolute;top:100%;left:0;right:0;background:#ffffff;flex-direction:column;align-items:flex-start;padding:16px 20px;gap:4px;box-shadow:0 8px 25px rgba(0,0,0,.12);border-top:3px solid #1060A0;}
+        .navbar-nav-custom.open{display:flex;}
+        .nav-link-custom{width:100%;padding:10px 0;}
+        .btn-nav-cta{width:100%;justify-content:center;margin-top:8px;}
+        .nav-cart-btn{margin-left:4px;}
+      }
+      .cart-nav-actions{display:flex;align-items:center;gap:10px;}
+      .cart-nav-link{font-size:.85rem;color:#374151;text-decoration:none;padding:5px 10px;border:1px solid transparent;border-radius:0;}
+      .cart-nav-link:hover{border-color:#d1d5db;background:#f9fafb;color:#111827;}
+      .cart-nav-count{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:#111827;border:1px solid #d1d5db;padding:4px 10px;border-radius:0;background:#f9fafb;}
+      .cart-nav-count-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:0;background:#2563eb;color:#fff;font-weight:600;font-size:.75rem;}
+      .cart-wrapper{padding:32px 0 32px;}
+      .cart-title-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+      .cart-title{font-size:1.4rem;font-weight:800;color:#111827;margin:0;}
+      .cart-title span{font-size:1rem;font-weight:500;color:#4b5563;margin-left:8px;}
+      .cart-back-btn{font-size:.8rem;border:1px solid #d1d5db;background:#ffffff;color:#374151;padding:6px 10px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border-radius:0;}
+      .cart-back-btn:hover{background:#f3f4f6;color:#111827;}
+      .cart-layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px;}
+      @media(max-width:991px){.cart-layout{grid-template-columns:minmax(0,1fr);}}
+      .cart-card{background:#ffffff;border-radius:0;border:1px solid #e0e3eb;padding:24px 24px 20px;}
+      .cart-empty{padding:26px 8px;text-align:center;color:#6b7280;font-size:.9rem;}
+      .cart-empty i{font-size:2rem;color:#d1d5db;margin-bottom:8px;}
+      .cart-empty .btn{border-radius:0;}
+      .cart-table{width:100%;border-collapse:collapse;}
+      .cart-table th{font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;font-weight:600;padding:10px 8px;border-bottom:1px solid #e5e7eb;text-align:left;}
+      .cart-table td{padding:12px 10px;vertical-align:middle;border-bottom:1px solid #f3f4f6;font-size:1rem;}
+      .cart-product-name{font-weight:600;color:#111827;font-size:1.02rem;}
+      .cart-product-ref{font-size:.88rem;color:#6b7280;}
+      .cart-qty-control{display:inline-flex;align-items:center;border:1px solid #e5e7eb;border-radius:0;overflow:hidden;background:#f9fafb;}
+      .cart-qty-btn{width:26px;height:26px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#4b5563;cursor:pointer;}
+      .cart-qty-val{min-width:30px;text-align:center;font-size:.88rem;font-weight:600;color:#111827;}
+      .cart-remove-btn{border:none;background:none;color:#9ca3af;cursor:pointer;font-size:.9rem;}
+      .cart-remove-btn:hover{color:#b91c1c;}
+      .cart-summary-title{font-size:1.2rem;font-weight:700;margin:0 0 10px;color:#111827;}
+      .cart-summary-line{display:flex;align-items:center;justify-content:space-between;font-size:1rem;color:#4b5563;margin-bottom:6px;}
+      .cart-summary-line strong{color:#111827;}
+      .cart-summary-divider{border-top:1px solid #e5e7eb;margin:12px 0;}
+      .cart-form-label{display:block;font-size:.8rem;font-weight:600;color:#374151;margin-bottom:4px;}
+      .cart-form-input,.cart-form-textarea{width:100%;border:1px solid #e5e7eb;border-radius:0;padding:11px 11px;font-size:1rem;outline:none;transition:border-color .15s;}
+      .cart-form-textarea{min-height:85px;resize:vertical;}
+      .cart-form-input:focus,.cart-form-textarea:focus{border-color:#2563eb;}
+      .cart-errors{font-size:.8rem;color:#b91c1c;margin-top:3px;}
+      .cart-submit-btn{width:100%;border:none;border-radius:0;background:#2563eb;color:#fff;font-weight:600;font-size:1rem;padding:12px 16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+      .cart-submit-btn:hover{background:#1d4ed8;}
+      .cart-submit-btn:disabled{opacity:.75;cursor:default;}
+      .cart-badge-pill{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;padding:4px 8px;border-radius:0;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;}
+      .cart-badge-pill i{color:#16a34a;}
+      .alert{padding:8px 10px;border-radius:0;font-size:.83rem;margin-bottom:10px;border:1px solid transparent;background:#f9fafb;color:#374151;}
+      .alert-info{border-color:#e5e7eb;background:#f9fafb;color:#374151;}
+      .alert-warning{border-color:#facc15;background:#fefce8;color:#854d0e;}
+      .alert-success{border-color:#22c55e;background:#f0fdf4;color:#166534;}
+      .alert-danger{border-color:#fecaca;background:#fef2f2;color:#b91c1c;}
+    </style>
+  </head>
+  <body>
+    <!-- TOP INFO BAR (copiée de l'accueil) -->
+    <div class="top-info-bar">
+      <div class="container">
+        <div class="info-left">
+          <div class="info-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>8CMR+GV2, rue 17.127, Pissy, Ouagadougou</span>
+          </div>
+          <div class="info-item d-none d-md-flex">
+            <i class="fa-solid fa-clock"></i>
+            <span>Lun-Jeu 08h-17h &nbsp;|&nbsp; Ven-Sam 09h-17h &nbsp;|&nbsp; Dim Fermé</span>
+          </div>
+        </div>
+        <div class="info-right">
+          <div class="info-item me-2">
+            <i class="fa-solid fa-phone"></i>
+            <a href="tel:+22676909001">+226 76 90 90 01</a>
+          </div>
+          <div class="top-auth">
+            {% if user.is_authenticated %}
+              <span class="auth-user-pill">
+                <i class="fa-solid fa-user-check"></i>
+                Connecté
+              </span>
+              <a href="{% url 'front:logout' %}"><i class="fa-solid fa-right-from-bracket" style="margin-right:9px;"></i>Déconnexion</a>
+            {% else %}
+              <a href="{% url 'front:login' %}"><i class="fa-solid fa-user" style="margin-right:9px;"></i>Connexion</a>
+              <a href="{% url 'front:register' %}"><i class="fa-solid fa-user-plus" style="margin-right:9px;"></i>Inscription</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVBAR (copiée de l'accueil) -->
+    <nav class="main-navbar" id="mainNav">
+      <div class="container">
+        <a href="{% url 'front:index' %}" class="navbar-brand-custom">
+          <img src="{% static 'site/img/logo.jpg' %}" alt="AIRPLUS HVAC" />
+          <div class="brand-text">AIRPLUS HVAC<small>Pièces Automobiles</small></div>
+        </a>
+        <div style="flex:1;"></div>
+        <a href="{% url 'front:cart_detail' %}" class="nav-cart-btn" aria-label="Voir le panier">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="nav-cart-count" id="navCartCount">{{ cart_item_count }}</span>
+        </a>
+        <button class="mobile-toggle" onclick="toggleNav()" aria-label="Menu">
+          <i class="fa-solid fa-bars" id="navIcon"></i>
+        </button>
+      </div>
+    </nav>
+
+    <div class="cart-wrapper">
+      <div class="container">
+        <div class="cart-title-row">
+          <h1 class="cart-title">
+            Votre panier
+            <span>({{ total_quantity }} article{{ total_quantity|pluralize }})</span>
+          </h1>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <a href="{% url 'front:index' %}" class="cart-back-btn"><i class="fa-solid fa-arrow-left"></i> Retour à l'accueil</a>
+          </div>
+        </div>
+
+        <div class="cart-layout">
+          <div class="cart-card">
+            {% if not items %}
+            <div class="cart-empty">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <p>Votre panier est actuellement vide.</p>
+              <p style="margin-top:8px;">
+                <a href="{% url 'front:index' %}" class="btn btn-sm btn-primary" style="font-size:.8rem;padding:6px 14px;border-radius:4px;"><i class="fa-solid fa-border-all" style="font-size:.75rem;"></i> Voir les produits</a>
+              </p>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+              Sélectionnez vos pièces, ajustez les quantités puis validez le formulaire à droite pour envoyer une demande de devis groupée.
+            </div>
+            <div class="table-responsive">
+              <table class="cart-table">
+                <thead>
+                  <tr>
+                    <th>Produit</th>
+                    <th style="width:120px;">Quantité</th>
+                    <th style="width:70px;text-align:center;">Retirer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in items %}
+                  <tr>
+                    <td>
+                      <div class="cart-product-name">{{ item.product.designation }}</div>
+                      <div class="cart-product-ref">Réf. {{ item.product.reference }}</div>
+                    </td>
+                    <td>
+                      <div class="cart-qty-control">
+                        <form method="post" action="{% url 'front:cart_remove' %}" style="margin:0;">
+                          {% csrf_token %}
+                          <input type="hidden" name="product_id" value="{{ item.product.pk }}" />
+                          <input type="hidden" name="delta" value="-1" />
+                          <button type="submit" class="cart-qty-btn" aria-label="Diminuer">
+                            <i class="fa-solid fa-minus"></i>
+                          </button>
+                        </form>
+                        <div class="cart-qty-val">{{ item.quantity }}</div>
+                        <form method="post" action="{% url 'front:cart_add' %}" style="margin:0;">
+                          {% csrf_token %}
+                          <input type="hidden" name="product_id" value="{{ item.product.pk }}" />
+                          <input type="hidden" name="quantity" value="1" />
+                          <button type="submit" class="cart-qty-btn" aria-label="Augmenter">
+                            <i class="fa-solid fa-plus"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                    <td style="text-align:center;">
+                      <form method="post" action="{% url 'front:cart_remove' %}" style="margin:0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ item.product.pk }}" />
+                        <input type="hidden" name="delta" value="-9999" />
+                        <button type="submit" class="cart-remove-btn" title="Supprimer du panier">
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="cart-card">
+            <div class="cart-summary-title">Demande de devis pour ce panier</div>
+            {% if not items %}
+            <div class="alert alert-warning">
+              Ajoutez d'abord des produits à votre panier pour pouvoir envoyer une demande de devis groupée.
+            </div>
+            {% else %}
+            <div class="cart-summary-line">
+              <span>Total d'articles</span>
+              <strong>{{ total_quantity }}</strong>
+            </div>
+            <div class="cart-summary-divider"></div>
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for err in form.non_field_errors %}
+              <div>{{ err }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <form method="post" action="{% url 'front:cart_quote' %}">
+              {% csrf_token %}
+              <div style="margin-bottom:10px;">
+                <label for="id_subject" class="cart-form-label">Objet</label>
+                <input
+                  type="text"
+                  name="subject"
+                  id="id_subject"
+                  class="cart-form-input"
+                  value="{{ form.subject.value|default_if_none:'' }}"
+                  placeholder="Objet de votre demande (optionnel)"
+                />
+                {% if form.subject.errors %}
+                <div class="cart-errors">
+                  {% for err in form.subject.errors %}
+                  <div>{{ err }}</div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <div style="margin-bottom:14px;">
+                <label for="id_message" class="cart-form-label">Message <span style="color:#b91c1c;">*</span></label>
+                <textarea
+                  name="message"
+                  id="id_message"
+                  class="cart-form-textarea"
+                  placeholder="Précisez vos besoins : quantités exactes, délais souhaités, informations complémentaires…"
+                >{{ form.message.value|default_if_none:'' }}</textarea>
+                {% if form.message.errors %}
+                <div class="cart-errors">
+                  {% for err in form.message.errors %}
+                  <div>{{ err }}</div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              <button type="submit" class="cart-submit-btn" {% if not items %}disabled{% endif %}>
+                <i class="fa-solid fa-file-signature"></i>
+                Envoyer la demande de devis
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'site/js/jquery.min.js' %}"></script>
+    <script src="{% static 'site/js/bootstrap.min.js' %}"></script>
+    <script>
+      function toggleNav(){
+        const menu=document.getElementById('navMenu');
+        const icon=document.getElementById('navIcon');
+        menu.classList.toggle('open');
+        icon.className=menu.classList.contains('open')?'fa-solid fa-xmark':'fa-solid fa-bars';
+      }
+      document.querySelectorAll('#navMenu a').forEach(l=>l.addEventListener('click',()=>{
+        const menu=document.getElementById('navMenu');
+        const icon=document.getElementById('navIcon');
+        if(menu){menu.classList.remove('open');}
+        if(icon){icon.className='fa-solid fa-bars';}
+      }));
+    </script>
+  </body>
+</html>

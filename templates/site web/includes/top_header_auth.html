@@ -1,0 +1,45 @@
+{% if user.is_authenticated %}
+<li class="dropdown" style="display: inline-block">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: #fff"
+    ><i class="fa fa-user"></i> {{ user.email }} <b class="caret"></b
+  ></a>
+  <ul class="dropdown-menu dropdown-menu-right" style="right: 0; left: auto">
+    {% if user.is_staff %}
+    <li>
+      <a href="{% url 'gestion:index' %}" style="color: #333"><i class="fa fa-dashboard"></i> Back-office</a>
+    </li>
+    {% endif %}
+    <li>
+      <a href="{% url 'front:logout' %}" style="color: #333"><i class="fa fa-sign-out"></i> Déconnexion</a>
+    </li>
+  </ul>
+</li>
+{% else %}
+<li>
+  <a href="{% url 'front:login' %}"><i class="fa fa-sign-in"></i> Connexion</a>
+</li>
+<li>
+  <a href="{% url 'front:register' %}"><i class="fa fa-user-plus"></i> Inscription</a>
+</li>
+{% endif %}
+
+<!-- Script pour forcer le dropdown à fonctionner -->
+<script>
+  $(document).ready(function () {
+    // Initialiser les dropdowns Bootstrap
+    $('.dropdown-toggle').dropdown();
+
+    // Fallback manuel si Bootstrap ne charge pas
+    $('.dropdown-toggle').click(function (e) {
+      e.preventDefault();
+      $(this).next('.dropdown-menu').toggle();
+    });
+
+    // Fermer le dropdown quand on clique ailleurs
+    $(document).click(function (e) {
+      if (!$(e.target).closest('.dropdown').length) {
+        $('.dropdown-menu').hide();
+      }
+    });
+  });
+</script>

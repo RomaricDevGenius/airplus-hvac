@@ -1,0 +1,61 @@
+{% extends layout_path %}
+{% load static i18n %}
+
+{% block title %}{% if product %}Modifier{% else %}Ajouter{% endif %} un produit – Back-office{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h4 class="fw-bold mb-0">{% if product %}Modifier le produit{% else %}Nouveau produit{% endif %}</h4>
+  <a href="{% url 'gestion:product-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="id_reference">Référence</label>
+          <input type="text" name="reference" id="id_reference" class="form-control" value="{{ form.reference.value|default:'' }}" required maxlength="64">
+          {% if form.reference.errors %}<div class="invalid-feedback d-block">{{ form.reference.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="id_designation">Désignation</label>
+          <input type="text" name="designation" id="id_designation" class="form-control" value="{{ form.designation.value|default:'' }}" required maxlength="255">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="id_quantity">Quantité en stock</label>
+          <input type="number" name="quantity" id="id_quantity" class="form-control" value="{{ form.quantity.value|default:0 }}" min="0">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="id_unit_price">Prix unitaire (FCFA)</label>
+          <input type="number" name="unit_price" id="id_unit_price" class="form-control" value="{{ form.unit_price.value|default:0 }}" min="0" step="0.01">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="id_alert_threshold">Seuil d'alerte</label>
+          <input type="number" name="alert_threshold" id="id_alert_threshold" class="form-control" value="{{ form.alert_threshold.value|default:5 }}" min="0">
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="id_observation">Observation</label>
+          <textarea name="observation" id="id_observation" class="form-control" rows="2">{{ form.observation.value|default:'' }}</textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="id_image">Image</label>
+          <input type="file" name="image" id="id_image" class="form-control" accept="image/*">
+          {% if product.image %}<p class="small text-muted mt-1">Actuel : <a href="{{ product.image.url }}" target="_blank">{{ product.image.name }}</a></p>{% endif %}
+        </div>
+        <div class="col-md-6 d-flex align-items-end">
+          <div class="form-check form-switch">
+            <input type="checkbox" name="is_visible" id="id_is_visible" class="form-check-input" {% if not product or product.is_visible %}checked{% endif %}>
+            <label class="form-check-label" for="id_is_visible">Visible sur le site client</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <a href="{% url 'gestion:product-list' %}" class="btn btn-outline-secondary">Annuler</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

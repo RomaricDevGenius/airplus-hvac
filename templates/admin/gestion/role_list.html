@@ -1,0 +1,70 @@
+{% extends layout_path %}
+{% load i18n %}
+
+{% block title %}Rôles – Back-office{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h4 class="fw-bold mb-0">Rôles</h4>
+  <a href="{% url 'gestion:role-create' %}" class="btn btn-primary">Ajouter un rôle</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Nom du rôle</th>
+            <th>Permissions</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for role in roles %}
+          <tr>
+            <td>{{ role.name }}</td>
+            <td>{{ role.permissions.count }} permission(s)</td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'gestion:role-detail' role.pk %}" class="btn btn-sm btn-icon btn-outline-secondary" title="Voir"><i class="ti ti-eye"></i></a>
+                <a href="{% url 'gestion:role-update' role.pk %}" class="btn btn-sm btn-icon btn-outline-primary" title="Modifier"><i class="ti ti-edit"></i></a>
+                <a href="{% url 'gestion:role-delete' role.pk %}" class="btn btn-sm btn-icon btn-outline-danger" title="Supprimer"><i class="ti ti-trash"></i></a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="text-center text-muted">Aucun rôle. Créez un rôle pour gérer les accès.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if page_obj.paginator.count > 0 %}
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mt-3 pt-3 border-top">
+      <p class="text-muted small mb-0">
+        Affichage {{ page_obj.start_index }}–{{ page_obj.end_index }} sur {{ page_obj.paginator.count }} rôle{{ page_obj.paginator.count|pluralize }}
+      </p>
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav aria-label="Pagination des rôles">
+        <ul class="pagination pagination-sm mb-0">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Précédent"><i class="ti ti-chevron-left"></i></a>
+          </li>
+          {% endif %}
+          <li class="page-item disabled">
+            <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+          </li>
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Suivant"><i class="ti ti-chevron-right"></i></a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

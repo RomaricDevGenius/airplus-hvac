@@ -1,0 +1,167 @@
+{% extends layout_path %}
+{% load static i18n %}
+{% block title %}{% if user_obj %}Modifier{% else %}Ajouter{% endif %} un utilisateur – Back-office{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h4 class="fw-bold mb-0">{% if user_obj %}Modifier l'utilisateur{% else %}Nouvel utilisateur{% endif %}</h4>
+  <a href="{% url 'gestion:user-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="id_email">Email (identifiant de connexion)</label>
+          {{ form.email }} {% if form.email.errors %}
+          <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+          {% endif %}
+        </div>
+        {% if not user_obj %}
+        <div class="col-md-3">
+          <label class="form-label" for="id_password1">Mot de passe</label>
+          {{ form.password1 }} {% if form.password1.errors %}
+          <div class="invalid-feedback d-block">{{ form.password1.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="id_password2">Confirmer le mot de passe</label>
+          {{ form.password2 }} {% if form.password2.errors %}
+          <div class="invalid-feedback d-block">{{ form.password2.errors.0 }}</div>
+          {% endif %}
+        </div>
+        {% endif %}
+        <div class="col-md-6">
+          <label class="form-label" for="id_first_name">Prénom</label>
+          {{ form.first_name }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="id_last_name">Nom</label>
+          {{ form.last_name }}
+        </div>
+        <div class="col-12">
+          <label class="form-label d-block mb-3">Rôles</label>
+          <p class="text-muted small mb-3">
+            Cliquez sur un rôle pour l'assigner ou le retirer. Les permissions du rôle s'appliquent à l'utilisateur.
+          </p>
+          <div class="row g-2" id="role-cards">
+            {% for g in all_groups %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+              <label
+                class="role-card d-block mb-0 rounded border p-3 text-center text-break cursor-pointer position-relative {% if g.pk in selected_group_ids %}role-card-selected border-success bg-success bg-opacity-10{% else %}border-secondary{% endif %}"
+                data-role-id="{{ g.pk }}"
+              >
+                <input
+                  type="checkbox"
+                  name="groups"
+                  value="{{ g.pk }}"
+                  class="d-none role-checkbox"
+                  {%
+                  if
+                  g.pk
+                  in
+                  selected_group_ids
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <span class="role-label">{{ g.name }}</span>
+                <span
+                  class="role-check position-absolute top-0 end-0 {% if g.pk in selected_group_ids %}d-inline-flex{% else %}d-none{% endif %}"
+                  title="Sélectionné"
+                >
+                  <i class="ti ti-check"></i>
+                </span>
+              </label>
+            </div>
+            {% empty %}
+            <div class="col-12">
+              <p class="text-muted">Aucun rôle disponible. Créez des rôles dans Administration → Rôles.</p>
+            </div>
+            {% endfor %}
+          </div>
+          {% if form.groups.errors %}
+          <div class="invalid-feedback d-block">{{ form.groups.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-6">
+          <div class="form-check form-switch">
+            {{ form.is_staff }}
+            <label class="form-check-label" for="id_is_staff">Accès back-office (staff)</label>
+          </div>
+        </div>
+        {% if user_obj %}
+        <div class="col-md-6">
+          <div class="form-check form-switch">
+            {{ form.is_active }}
+            <label class="form-check-label" for="id_is_active">Compte actif</label>
+          </div>
+        </div>
+        {% endif %}
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <a href="{% url 'gestion:user-list' %}" class="btn btn-outline-secondary">Annuler</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .role-card {
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .role-card:hover {
+    border-color: var(--bs-primary) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+  }
+  .role-card.cursor-pointer {
+    cursor: pointer;
+  }
+  .role-card-selected {
+    border-width: 2px !important;
+  }
+  .role-check {
+    width: 14px;
+    height: 14px;
+    align-items: center;
+    justify-content: center;
+    margin: 4px;
+    color: var(--bs-success);
+    font-size: 10px;
+    line-height: 1;
+  }
+  .role-check i {
+    font-size: 10px;
+  }
+</style>
+
+<script>
+  (function () {
+    document.querySelectorAll('.role-card').forEach(function (card) {
+      card.addEventListener('click', function (e) {
+        e.preventDefault();
+        var checkbox = this.querySelector('.role-checkbox');
+        var checkEl = this.querySelector('.role-check');
+        if (!checkbox || !checkEl) return;
+        checkbox.checked = !checkbox.checked;
+        this.classList.toggle('role-card-selected', checkbox.checked);
+        this.classList.toggle('border-success', checkbox.checked);
+        this.classList.toggle('bg-success', checkbox.checked);
+        this.classList.toggle('bg-opacity-10', checkbox.checked);
+        this.classList.toggle('border-secondary', !checkbox.checked);
+        if (checkbox.checked) {
+          checkEl.classList.remove('d-none');
+          checkEl.classList.add('d-inline-flex');
+        } else {
+          checkEl.classList.add('d-none');
+          checkEl.classList.remove('d-inline-flex');
+        }
+      });
+    });
+  })();
+</script>
+{% endblock %}

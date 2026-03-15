@@ -1,0 +1,275 @@
+{% extends "admin/layout/layout_blank.html" %} {% load static i18n %} {% block title %}Créer un compte – AIRPLUS HVAC{%
+endblock %} {% block vendor_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+{% endblock %} {% block page_css %}
+<style>
+  body {
+    background: #f0f4f8 !important;
+  }
+  .layout-wrapper {
+    background: #f0f4f8 !important;
+  }
+  .reg-card {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 4px 24px rgba(16, 96, 160, 0.13);
+    width: 100%;
+    max-width: 560px;
+    padding: 32px 42px;
+  }
+  .reg-logo {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .reg-logo img {
+    height: 72px;
+    width: auto;
+  }
+  .reg-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: #1060a0;
+    text-align: center;
+    margin-bottom: 3px;
+  }
+  .reg-subtitle {
+    text-align: center;
+    color: #606060;
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+  .reg-divider {
+    border: none;
+    border-top: 1px solid #e0e8f0;
+    margin: 0 0 18px;
+  }
+  .reg-card .form-label {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  .reg-card .form-control {
+    border: 1px solid #c8d8e8;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    padding: 9px 13px;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .reg-card .form-control:focus {
+    border-color: #1060a0;
+    box-shadow: 0 0 0 3px rgba(16, 96, 160, 0.1);
+    outline: none;
+  }
+  .btn-register {
+    width: 100%;
+    padding: 11px;
+    background: #1060a0;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.25s;
+    margin-top: 6px;
+  }
+  .btn-register:hover {
+    background: #0a4d85;
+    color: #fff;
+  }
+  .reg-links {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 0.84rem;
+    color: #606060;
+  }
+  .reg-links a {
+    color: #1060a0;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .reg-links a:hover {
+    color: #2196f3;
+  }
+  .reg-links .sep {
+    margin: 0 8px;
+    color: #ccc;
+  }
+  /* password strength */
+  #password-strength-wrap {
+    margin-top: 8px;
+  }
+  .crit-icon {
+    display: inline-block;
+    width: 14px;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 90vh; padding: 30px 16px">
+  <div class="reg-card">
+    <div class="reg-logo">
+      <a href="{% url 'front:index' %}"><img src="{% static 'site/img/logo.jpg' %}" alt="AIRPLUS HVAC" /></a>
+    </div>
+    <div class="reg-title">AIRPLUS HVAC</div>
+    <div class="reg-subtitle">Créer un compte client</div>
+    <hr class="reg-divider" />
+
+    {% if messages %} {% for message in messages %}
+    <div
+      class="alert alert-{{ message.tags }} alert-dismissible py-2 px-3"
+      role="alert"
+      style="font-size: 0.85rem; border-radius: 4px"
+    >
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %} {% endif %} {% if form.non_field_errors %}
+    <div class="alert alert-danger py-2 px-3" role="alert" style="font-size: 0.85rem; border-radius: 4px">
+      {{ form.non_field_errors.0 }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="">
+      {% csrf_token %}
+      <div class="mb-2">
+        <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+        {{ form.username }} {% if form.username.errors %}
+        <div class="invalid-feedback d-block" style="font-size: 0.8rem">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="mb-2">
+        <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+        {{ form.email }} {% if form.email.errors %}
+        <div class="invalid-feedback d-block" style="font-size: 0.8rem">{{ form.email.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="row g-2 mb-2">
+        <div class="col-6">
+          <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
+          {{ form.first_name }}
+        </div>
+        <div class="col-6">
+          <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+          {{ form.last_name }}
+        </div>
+      </div>
+      <div class="mb-2">
+        <label for="{{ form.company_name.id_for_label }}" class="form-label">{{ form.company_name.label }}</label>
+        {{ form.company_name }}
+      </div>
+      <div class="mb-2">
+        <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }}</label>
+        {{ form.phone }}
+      </div>
+      <div class="mb-2">
+        <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}</label>
+        {{ form.address }}
+      </div>
+      <div class="mb-2">
+        <label for="{{ form.password1.id_for_label }}" class="form-label">{{ form.password1.label }}</label>
+        {{ form.password1 }}
+        <div id="password-strength-wrap" style="display: none">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <div class="progress flex-grow-1" style="height: 5px; border-radius: 3px">
+              <div
+                id="password-strength-bar"
+                class="progress-bar"
+                role="progressbar"
+                style="width: 0%; transition: width 0.2s ease"
+              ></div>
+            </div>
+            <span id="password-strength-label" class="small fw-medium"></span>
+          </div>
+          <ul id="password-criteria" class="small text-muted mb-0 ps-0" style="list-style: none; font-size: 0.78rem">
+            <li id="crit-length"><span class="crit-icon">○</span> Au moins 8 caractères</li>
+            <li id="crit-not-numeric"><span class="crit-icon">○</span> Pas uniquement des chiffres</li>
+            <li id="crit-variety"><span class="crit-icon">○</span> Lettres, chiffres ou caractères spéciaux</li>
+          </ul>
+        </div>
+        {% if form.password1.errors %}
+        <div class="invalid-feedback d-block" style="font-size: 0.8rem">{{ form.password1.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="mb-3">
+        <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}</label>
+        {{ form.password2 }} {% if form.password2.errors %}
+        <div class="invalid-feedback d-block" style="font-size: 0.8rem">{{ form.password2.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <button type="submit" class="btn-register">
+        <i class="fa-solid fa-user-plus" style="margin-right: 8px"></i>Créer mon compte
+      </button>
+    </form>
+
+    <div class="reg-links">
+      <a href="{% url 'front:index' %}">Retour au site</a>
+      <span class="sep">·</span>
+      <a href="{% url 'front:login' %}">Se connecter</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var p1 = document.getElementById('id_password1');
+    var wrap = document.getElementById('password-strength-wrap');
+    var bar = document.getElementById('password-strength-bar');
+    var label = document.getElementById('password-strength-label');
+    var critLength = document.getElementById('crit-length');
+    var critNotNumeric = document.getElementById('crit-not-numeric');
+    var critVariety = document.getElementById('crit-variety');
+    function updateCrit(el, ok) {
+      el.querySelector('.crit-icon').textContent = ok ? '✓' : '○';
+      el.style.color = ok ? '#1a7a40' : '';
+    }
+    function checkPassword(val) {
+      if (!val.length) {
+        wrap.style.display = 'none';
+        return;
+      }
+      wrap.style.display = 'block';
+      var len = val.length;
+      var hasLetter = /[a-zA-Z]/.test(val);
+      var hasDigit = /[0-9]/.test(val);
+      var hasSpecial = /[^a-zA-Z0-9]/.test(val);
+      var allNumeric = /^[0-9]+$/.test(val);
+      var okLength = len >= 8;
+      var okNotNumeric = !allNumeric;
+      var okVariety = hasLetter && (hasDigit || hasSpecial);
+      updateCrit(critLength, okLength);
+      updateCrit(critNotNumeric, okNotNumeric);
+      updateCrit(critVariety, okVariety);
+      var score = (okLength ? 1 : 0) + (okNotNumeric ? 1 : 0) + (okVariety ? 1 : 0);
+      if (len >= 12 && hasLetter && hasDigit && hasSpecial) score = 3;
+      if (score <= 1) {
+        bar.style.width = '33%';
+        bar.className = 'progress-bar bg-danger';
+        label.textContent = 'Faible';
+        label.className = 'small fw-medium text-danger';
+      } else if (score === 2) {
+        bar.style.width = '66%';
+        bar.className = 'progress-bar bg-warning';
+        label.textContent = 'Moyen';
+        label.className = 'small fw-medium text-warning';
+      } else {
+        bar.style.width = '100%';
+        bar.className = 'progress-bar bg-success';
+        label.textContent = 'Fort';
+        label.className = 'small fw-medium text-success';
+      }
+    }
+    if (p1) {
+      p1.addEventListener('input', function () {
+        checkPassword(p1.value);
+      });
+      p1.addEventListener('focus', function () {
+        if (p1.value) checkPassword(p1.value);
+      });
+    }
+  })();
+</script>
+{% endblock %}

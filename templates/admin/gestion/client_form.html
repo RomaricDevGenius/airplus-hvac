@@ -1,0 +1,63 @@
+{% extends layout_path %}
+{% load static i18n %}
+
+{% block title %}{% if is_edit %}Modifier le client{% else %}Nouveau client{% endif %} – Back-office{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h4 class="fw-bold mb-0">{% if is_edit %}Modifier le client{% else %}Nouveau client{% endif %}</h4>
+  <div class="d-flex gap-2">
+    {% if is_edit and client %}<a href="{% url 'gestion:client-detail' client.pk %}" class="btn btn-outline-primary">Voir le client</a>{% endif %}
+    <a href="{% url 'gestion:client-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="id_email">Email (identifiant de connexion client)</label>
+          {{ form.email }}
+          {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="id_password1">{{ form.password1.label }}</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}<div class="invalid-feedback d-block">{{ form.password1.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="id_password2">{{ form.password2.label }}</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}<div class="invalid-feedback d-block">{{ form.password2.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="id_first_name">Prénom</label>
+          {{ form.first_name }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="id_last_name">Nom</label>
+          {{ form.last_name }}
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="id_company_name">Raison sociale / Entreprise</label>
+          {{ form.company_name }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="id_phone">Téléphone</label>
+          {{ form.phone }}
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="id_address">Adresse</label>
+          {{ form.address }}
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <a href="{% url 'gestion:client-list' %}" class="btn btn-outline-secondary">Annuler</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

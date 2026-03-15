@@ -1,0 +1,19 @@
+{% extends layout_path %}
+{% load i18n %}
+
+{% block title %}Supprimer le produit – Back-office{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h4 class="mb-3">Supprimer le produit ?</h4>
+    <p><strong>{{ product.reference }}</strong> – {{ product.designation }}</p>
+    <p class="text-danger">Cette action est irréversible.</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Supprimer</button>
+      <a href="{% url 'gestion:product-list' %}" class="btn btn-outline-secondary">Annuler</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

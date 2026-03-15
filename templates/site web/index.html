@@ -1,0 +1,972 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIRPLUS HVAC – Pièces Auto de Qualité | Ouagadougou</title>
+  <meta name="description" content="AIRPLUS HVAC, votre spécialiste en pièces de rechange automobiles de qualité à Ouagadougou." />
+  <link rel="icon" href="{% static 'site/img/logo.jpg' %}" type="image/jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="{% static 'site/css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'site/css/style.css' %}" />
+  <style>
+    :root{--primary:#1060A0;--primary-dark:#0a4d85;--primary-light:#e8f2fb;--accent:#2196F3;--gold:#FFD700;--dark:#1a1f2e;--text:#2c2c2c;--text-light:#606060;--white:#ffffff;--bg-light:#f4f7fb;--border:#d0e4f7;}
+    *{box-sizing:border-box;}
+    html{font-size:16px;}
+    body{font-family:'Inter',sans-serif;color:var(--text);margin:0;padding:0;overflow-x:hidden;}
+
+    /* TOP BAR */
+    .top-info-bar{background:var(--primary);padding:9px 0;font-size:.82rem;color:#fff;z-index:1000;position:relative;border-bottom:2px solid var(--accent);}
+    .top-info-bar .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+    .top-info-bar .info-left,.top-info-bar .info-right{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+    .top-info-bar .info-item{display:flex;align-items:center;gap:6px;opacity:.95;}
+    .top-info-bar .info-item i{font-size:.9rem;color:#fff;}
+    .top-info-bar a{color:#fff;text-decoration:none;transition:opacity .2s;}
+    .top-info-bar a:hover{opacity:.85;}
+    .top-auth{display:flex;align-items:center;gap:10px;}
+    .top-auth .auth-user-pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.4);padding:3px 9px;color:#fff;white-space:nowrap;}
+    .top-auth .auth-user-pill i{font-size:.85rem;color:#bbf7d0;}
+    .top-auth a{color:#fff;text-decoration:none;font-weight:500;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.4);transition:all .2s;font-size:.8rem;}
+    .top-auth a:hover{background:rgba(255,255,255,.15);}
+
+    /* NAVBAR */
+    .main-navbar{position:sticky;top:0;z-index:999;background:var(--white);box-shadow:0 2px 20px rgba(0,0,0,.1);padding:8px 0;transition:all .3s;}
+    .main-navbar>.container{display:flex;align-items:center;justify-content:space-between;gap:18px;}
+    .navbar-brand-custom{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0;}
+    .navbar-brand-custom img{height:44px;width:auto;}
+    .brand-text{font-family:'Montserrat',sans-serif;font-weight:800;font-size:.98rem;color:var(--primary);line-height:1.15;}
+    .brand-text small{display:block;font-size:.58rem;font-weight:500;color:var(--text-light);letter-spacing:1.5px;text-transform:uppercase;}
+    .navbar-nav-custom{display:flex;list-style:none;margin:0;padding:0;align-items:center;gap:4px;flex:1;justify-content:flex-end;}
+    .nav-link-custom{position:relative;text-decoration:none;color:var(--text);font-weight:500;font-size:.9rem;padding:7px 14px;transition:color .3s;}
+    .nav-link-custom::after{content:'';position:absolute;bottom:0;left:14px;right:14px;height:2px;background:var(--primary);transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+    .nav-link-custom:hover,.nav-link-custom.active{color:var(--primary);}
+    .nav-link-custom:hover::after,.nav-link-custom.active::after{transform:scaleX(1);}
+    .btn-nav-cta{background:var(--accent);color:#fff!important;padding:9px 20px!important;border-radius:4px;font-weight:600;font-size:.88rem;text-decoration:none;display:flex;align-items:center;gap:7px;box-shadow:0 2px 8px rgba(33,150,243,.35);transition:all .3s;letter-spacing:.3px;}
+    .btn-nav-cta:hover{background:var(--primary);box-shadow:0 4px 14px rgba(16,96,160,.45);color:#fff!important;}
+    .nav-cart-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;border:1px solid var(--border);background:#f4f6f9;color:var(--primary);cursor:pointer;text-decoration:none;transition:all .25s;flex-shrink:0;margin-left:8px;}
+    .nav-cart-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 3px 10px rgba(16,96,160,.35);}
+    .nav-cart-count{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:999px;background:#e53935;color:#fff;font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #fff;}
+    .mobile-toggle{display:none;background:none;border:none;font-size:1.5rem;color:var(--primary);cursor:pointer;padding:4px;}
+    @media(max-width:991px){
+      .mobile-toggle{display:block;}
+      .navbar-nav-custom{display:none;position:absolute;top:100%;left:0;right:0;background:var(--white);flex-direction:column;align-items:flex-start;padding:16px 20px;gap:4px;box-shadow:0 8px 25px rgba(0,0,0,.12);border-top:3px solid var(--primary);}
+      .navbar-nav-custom.open{display:flex;}
+      .nav-link-custom{width:100%;padding:10px 0;}
+      .btn-nav-cta{width:100%;justify-content:center;margin-top:8px;}
+      .nav-cart-btn{margin-left:4px;}
+    }
+
+    /* HERO */
+    .hero-slider{position:relative;height:88vh;max-height:600px;min-height:440px;overflow:hidden;}
+    .slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.2s ease;display:flex;align-items:center;}
+    .slide.active{opacity:1;z-index:1;}
+    .slide::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(16,96,160,.72) 0%,rgba(0,0,0,.45) 100%);}
+    .slide-content{position:relative;z-index:2;max-width:680px;margin-left:8%;color:#fff;}
+    .slide-badge{display:inline-block;background:var(--accent);border:none;color:#fff;font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 16px;border-radius:3px;margin-bottom:16px;}
+    .slide-title{font-family:'Montserrat',sans-serif;font-size:clamp(1.6rem,3.2vw,2.5rem);font-weight:900;line-height:1.15;margin-bottom:14px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3);}
+    .slide-desc{font-size:.97rem;line-height:1.6;color:rgba(255,255,255,.9);margin-bottom:24px;max-width:500px;}
+    .slide-actions{display:flex;gap:12px;flex-wrap:wrap;}
+    .btn-slide-primary{background:var(--accent);color:#fff;font-weight:700;padding:12px 26px;border-radius:4px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-size:.9rem;box-shadow:0 3px 10px rgba(33,150,243,.4);transition:all .3s;letter-spacing:.3px;}
+    .btn-slide-primary:hover{background:#1976D2;box-shadow:0 5px 16px rgba(33,150,243,.55);color:#fff;}
+    .btn-slide-secondary{background:transparent;border:2px solid rgba(255,255,255,.85);color:#fff;font-weight:600;padding:10px 24px;border-radius:4px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-size:.9rem;transition:all .3s;}
+    .btn-slide-secondary:hover{background:#fff;color:var(--primary);}
+    .slider-dots{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:10;}
+    .dot{width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,.4);cursor:pointer;border:2px solid rgba(255,255,255,.6);transition:all .3s;}
+    .dot.active{background:var(--accent);border-color:var(--accent);transform:scale(1.3);}
+    .slider-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.5);color:#fff;width:46px;height:46px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:all .3s;user-select:none;}
+    .slider-arrow:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-50%);}
+    .slider-arrow.prev{left:24px;}
+    .slider-arrow.next{right:24px;}
+    @media(max-width:768px){.slide-content{margin-left:5%;margin-right:5%;}}
+
+    /* SECTION HEADER */
+    .section-header{text-align:center;margin-bottom:38px;}
+    .section-header .s-label{display:inline-flex;align-items:center;gap:10px;font-size:.75rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--primary);margin-bottom:10px;}
+    .section-header .s-label::before,.section-header .s-label::after{content:'';width:28px;height:2px;background:var(--accent);}
+    .section-header h2{font-family:'Montserrat',sans-serif;font-size:clamp(1.35rem,2.5vw,1.95rem);font-weight:800;color:var(--primary);margin-bottom:10px;}
+    .section-header p{color:var(--text-light);font-size:.92rem;max-width:520px;margin:0 auto;line-height:1.55;}
+
+    /* ABOUT */
+    .about-section{padding:70px 0;background:var(--white);overflow:hidden;}
+    .about-text .a-label{display:inline-flex;align-items:center;gap:10px;font-size:.75rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--primary);margin-bottom:12px;}
+    .about-text .a-label::before{content:'';width:28px;height:2px;background:var(--primary);}
+    .about-text h2{font-family:'Montserrat',sans-serif;font-size:clamp(1.35rem,2.5vw,1.85rem);font-weight:800;color:var(--primary);line-height:1.2;margin-bottom:14px;}
+    .about-text p{color:var(--text-light);line-height:1.7;margin-bottom:12px;font-size:.92rem;}
+    .about-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 24px;}
+    .feature-item{display:flex;align-items:center;gap:9px;font-size:.86rem;font-weight:500;color:var(--text);}
+    .feature-item i{width:30px;height:30px;background:var(--primary);color:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0;}
+    .btn-about{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:11px 24px;border-radius:4px;font-weight:600;font-size:.88rem;text-decoration:none;box-shadow:0 2px 8px rgba(16,96,160,.25);transition:all .3s;letter-spacing:.3px;}
+    .btn-about:hover{background:var(--accent);box-shadow:0 4px 14px rgba(33,150,243,.4);color:#fff;}
+    .about-image-wrap{position:relative;}
+    .about-img-main{width:100%;height:85vh;object-fit:cover;object-position:center;border-radius:12px;border:2px solid var(--accent);box-shadow:0 8px 20px rgba(33,150,243,.15);display:block;}
+    .about-stats-overlay{position:absolute;bottom:20px;left:-60px;width:175px;height:175px;background:linear-gradient(135deg,var(--primary) 0%,#1565C0 50%,var(--accent) 100%);border-radius:8px;border:1px solid rgba(255,255,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;box-shadow:0 15px 35px rgba(16,96,160,.4);overflow:hidden;}
+    .about-stats-overlay::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 20% 20%,rgba(255,255,255,.2) 0%,transparent 40%),radial-gradient(circle at 80% 80%,rgba(255,255,255,.15) 0%,transparent 40%);pointer-events:none;}
+    .about-stats-overlay::after{content:'';position:absolute;top:10px;left:10px;right:10px;bottom:10px;border:1px solid rgba(255,255,255,.15);border-radius:4px;pointer-events:none;}
+    .about-stats-overlay .s-num{font-family:'Montserrat',sans-serif;font-size:3rem;font-weight:700;color:#fff;line-height:1;margin-bottom:8px;}
+    .about-stats-overlay .s-txt{font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;color:#fff;letter-spacing:1.2px;text-align:center;line-height:1.25;text-transform:uppercase;}
+    @media(max-width:991px){.about-stats-overlay{display:none;}.about-section{padding:50px 0;}}
+    @media(max-width:768px){.about-img-main{height:55vw;}}
+
+    /* PRODUCTS */
+    .products-section{padding:65px 0;background:var(--bg-light);border-top:3px solid var(--primary-light);}
+    .product-card-new{background:var(--white);border-radius:0;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.08);border:1px solid var(--border);transition:all .35s;height:100%;display:flex;flex-direction:column;}
+    .product-card-new:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.13);}
+    .product-card-new .card-img-wrap{position:relative;overflow:hidden;height:200px;background:var(--primary-light);}
+    .product-card-new .card-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+    .product-card-new:hover .card-img-wrap img{transform:scale(1.05);}
+    .product-card-new .card-img-wrap .no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--primary);opacity:.3;font-size:3.5rem;}
+    .stock-badge{position:absolute;top:0;right:0;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:0;letter-spacing:.6px;text-transform:uppercase;}
+    .badge-in{background:var(--primary);color:#fff;}
+    .badge-low{background:#f57f17;color:#fff;}
+    .badge-out{background:#c62828;color:#fff;}
+    .product-card-new .card-body-new{padding:18px 20px 20px;flex:1;display:flex;flex-direction:column;}
+    .product-card-new .card-ref{font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--primary);margin-bottom:6px;}
+    .product-card-new .card-name{font-weight:600;font-size:1rem;color:var(--text);margin-bottom:12px;line-height:1.4;flex:1;}
+    .product-card-new .card-footer-new{display:flex;gap:8px;margin-top:auto;padding-top:14px;border-top:1px solid var(--border);}
+    .btn-card-devis{flex:1;text-align:center;background:var(--primary);color:#fff;padding:9px 14px;border-radius:0;text-decoration:none;font-size:.82rem;font-weight:600;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.3px;border:none;cursor:pointer;}
+    .btn-card-devis:hover{background:var(--accent);color:#fff;}
+    .btn-card-detail{width:38px;height:38px;background:#f4f6f9;color:var(--primary);border-radius:0;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:.85rem;transition:all .3s;flex-shrink:0;border:1px solid var(--border);cursor:pointer;}
+    .btn-card-detail:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+    .swiper-products .swiper-pagination-bullet{background:var(--primary);}
+    .swiper-products .swiper-button-next,.swiper-products .swiper-button-prev{color:var(--primary);}
+    .btn-voir-tout{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--primary);color:var(--primary);padding:11px 28px;border-radius:0;font-weight:600;font-size:.9rem;text-decoration:none;transition:all .3s;letter-spacing:.3px;}
+    .btn-voir-tout:hover{background:var(--primary);color:#fff;}
+    /* PRODUCT MODAL */
+    .pmodal-backdrop{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s;}
+    .pmodal-backdrop.open{opacity:1;visibility:visible;}
+    .pmodal-bg{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+    .pmodal-box{position:relative;z-index:1;background:#fff;width:90%;max-width:820px;max-height:92vh;overflow-y:auto;display:flex;flex-direction:column;border-radius:0;box-shadow:0 20px 60px rgba(0,0,0,.35);transform:scale(.95);transition:transform .3s;}
+    .pmodal-backdrop.open .pmodal-box{transform:scale(1);}
+    .pmodal-img{width:100%;height:320px;object-fit:cover;display:block;flex-shrink:0;}
+    .pmodal-img-placeholder{width:100%;height:320px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;color:var(--primary);opacity:.3;font-size:5rem;flex-shrink:0;}
+    .pmodal-body{padding:28px 30px;flex:1;}
+    .pmodal-ref{font-size:.75rem;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--primary);margin-bottom:8px;}
+    .pmodal-name{font-family:'Montserrat',sans-serif;font-size:1.35rem;font-weight:700;color:var(--text-dark);margin-bottom:16px;line-height:1.3;}
+    .pmodal-obs{font-size:.9rem;color:#555;line-height:1.65;margin-bottom:20px;}
+    .pmodal-meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;}
+    .pmodal-tag{padding:4px 12px;font-size:.75rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;background:#f4f6f9;color:var(--primary);border-left:3px solid var(--primary);}
+    .pmodal-tag.tag-out{background:#fce4ec;color:#c62828;border-left-color:#c62828;}
+    .pmodal-tag.tag-low{background:#fff8e1;color:#f57f17;border-left-color:#f57f17;}
+    .pmodal-footer{display:flex;gap:10px;border-top:1px solid var(--border);padding:18px 30px;background:#fafbfc;}
+    .pmodal-close{position:absolute;top:12px;right:14px;background:rgba(0,0,0,.5);color:#fff;border:none;width:30px;height:30px;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:0;z-index:2;transition:background .2s;}
+    .pmodal-close:hover{background:var(--primary);}
+    /* DEVIS MODAL */
+    .dmodal-box{position:relative;z-index:1;background:#fff;width:90%;max-width:560px;border-radius:0;box-shadow:0 20px 60px rgba(0,0,0,.35);transform:scale(.95);transition:transform .3s;}
+    .pmodal-backdrop.open .dmodal-box{transform:scale(1);}
+    .dmodal-header{padding:22px 28px 18px;border-bottom:1px solid var(--border);}
+    .dmodal-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.1rem;color:var(--text-dark);}
+    .dmodal-subtitle{font-size:.82rem;color:var(--primary);font-weight:600;margin-top:4px;}
+    .dmodal-body{padding:22px 28px;}
+    .dmodal-label{font-size:.8rem;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+    .dmodal-input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:0;font-size:.9rem;font-family:inherit;outline:none;transition:border-color .2s;color:var(--text);}
+    .dmodal-input:focus{border-color:var(--primary);}
+    .dmodal-footer{display:flex;gap:10px;border-top:1px solid var(--border);padding:16px 28px;background:#fafbfc;}
+    .dmodal-msg{padding:10px 14px;font-size:.85rem;font-weight:600;margin-bottom:14px;}
+    .dmodal-msg.ok{background:#e8f5e9;color:#2e7d32;border-left:3px solid #2e7d32;}
+    .dmodal-msg.err{background:#fce4ec;color:#c62828;border-left:3px solid #c62828;}
+    .dmodal-auth-notice{padding:24px 28px;text-align:center;color:#555;font-size:.9rem;}
+    .dmodal-auth-notice a{color:var(--primary);font-weight:600;}
+
+    /* MAP */
+    .map-section{padding:65px 0;background:var(--white);}
+    .map-container{position:relative;border-radius:6px;overflow:hidden;box-shadow:0 4px 18px rgba(16,96,160,.12);border:2px solid var(--primary);}
+    .map-container iframe{width:100%;height:360px;display:block;border:none;}
+    .map-info-overlay{position:absolute;top:20px;left:20px;background:var(--primary);color:#fff;border-radius:6px;padding:18px 22px;max-width:260px;box-shadow:0 6px 20px rgba(16,96,160,.4);}
+    .map-info-overlay h5{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:14px;color:#fff;}
+    .map-info-overlay .mir{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:.82rem;line-height:1.4;}
+    .map-info-overlay .mir i{color:#fff;margin-top:2px;flex-shrink:0;}
+    .map-info-overlay hr{border-color:rgba(255,255,255,.2);margin:8px 0;}
+
+    /* CONTACT */
+    .contact-section{padding:70px 0;background:var(--bg-light);border-top:3px solid var(--primary-light);}
+    .contact-form-wrapper{background:var(--white);border-radius:6px;padding:28px 30px;box-shadow:0 2px 14px rgba(16,96,160,.08);border:1px solid var(--border);}
+    .contact-form-wrapper::before{display:none;}
+    .contact-form-wrapper h3{font-family:'Montserrat',sans-serif;font-weight:700;color:var(--primary);margin-bottom:4px;}
+    .contact-form-wrapper .form-sub{color:var(--text-light);font-size:.88rem;margin-bottom:28px;}
+    .form-label-clean{display:block;font-size:.83rem;font-weight:600;color:var(--text);margin-bottom:5px;margin-top:14px;}
+    .btn-submit-contact{width:100%;background:var(--primary);color:#fff;border:none;padding:14px;border-radius:4px;font-weight:700;font-size:1rem;cursor:pointer;position:relative;overflow:hidden;transition:all .35s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.4px;}
+    .btn-submit-contact::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transition:left .5s;}
+    .btn-submit-contact:hover{background:var(--accent);box-shadow:0 4px 14px rgba(33,150,243,.4);}
+    .btn-submit-contact:hover::after{left:140%;}
+    .btn-submit-contact.loading .btn-text{display:none;}
+    .btn-submit-contact .spinner-sm{display:none;}
+    .btn-submit-contact.loading .spinner-sm{display:block;}
+    .info-card-item{background:var(--white);border-radius:5px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);border:1px solid var(--border);transition:all .3s;}
+    .info-card-item:hover{box-shadow:0 4px 16px rgba(16,96,160,.1);background:#fafcff;}
+    .info-card-icon{width:40px;height:40px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0;}
+    .info-card-item h6{font-weight:600;color:var(--primary);margin-bottom:4px;font-size:.88rem;}
+    .info-card-item p{color:var(--text-light);font-size:.85rem;margin:0;line-height:1.5;}
+    .contact-info-cards{display:flex;flex-direction:column;gap:18px;}
+
+    /* FOOTER */
+    .footer-modern{background:var(--primary);color:#fff;border-top:3px solid var(--accent);}
+    .footer-content{padding:2.8rem 0 1.5rem;}
+    .footer-logo-img{height:52px;width:auto;margin-bottom:12px;}
+    .footer-brand-name{font-family:'Montserrat',sans-serif;font-weight:800;font-size:1.15rem;color:#fff;margin-bottom:4px;}
+    .footer-tagline{color:rgba(255,255,255,.65);font-size:.8rem;font-style:italic;margin-bottom:14px;}
+    .footer-desc{color:rgba(255,255,255,.82);font-size:.86rem;line-height:1.65;margin-bottom:22px;}
+    .footer-social{display:flex;gap:10px;}
+    .social-btn{width:36px;height:36px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;text-decoration:none;transition:all .25s;}
+    .social-btn:hover{background:var(--accent);border-color:var(--accent);}
+    .footer-title{color:#fff;font-weight:700;font-size:1rem;margin-bottom:1.2rem;padding-bottom:8px;border-bottom:2px solid var(--accent);display:flex;align-items:center;gap:8px;}
+    .footer-title i{color:#fff;}
+    .footer-contact-list{display:flex;flex-direction:column;gap:12px;}
+    .footer-contact-item{display:flex;align-items:flex-start;gap:12px;}
+    .footer-contact-item .icon{width:34px;height:34px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0;}
+    .footer-contact-item strong{color:rgba(255,255,255,.6);font-size:.76rem;font-weight:600;display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px;}
+    .footer-contact-item span{color:#fff;font-size:.84rem;line-height:1.4;}
+    .footer-nav-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+    .footer-nav-item{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,.8);text-decoration:none;font-size:.85rem;padding:7px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.12);transition:all .25s;}
+    .footer-nav-item:hover{color:#fff;background:var(--accent);border-color:var(--accent);}
+    .footer-nav-item i{font-size:.82rem;}
+    .footer-divider{margin:1.6rem 0 1.2rem;border:none;border-top:1px solid rgba(255,255,255,.15);}
+    .footer-bottom-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding-top:1.2rem;border-top:1px solid rgba(255,255,255,.12);}
+    .footer-bottom-bar p{margin:0;font-size:.82rem;color:rgba(255,255,255,.75);}
+    .footer-bottom-bar strong{color:#fff;}
+    .footer-bottom-bar a{color:rgba(255,255,255,.85);text-decoration:none;font-weight:700;transition:color .2s;}
+    .footer-bottom-bar a:hover{color:#fff;}
+
+    /* SCROLL TOP */
+    .scroll-top-btn{position:fixed;bottom:28px;right:28px;width:44px;height:44px;background:var(--primary);color:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;z-index:9999;box-shadow:0 3px 10px rgba(16,96,160,.4);opacity:0;transform:translateY(20px);transition:all .35s;border:2px solid var(--accent);text-decoration:none;}
+    .scroll-top-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;}
+    .scroll-top-btn.visible{opacity:1;transform:translateY(0);}
+    .scroll-top-btn:hover{transform:translateY(-4px);color:#fff;}
+
+    /* TOAST */
+    .toast-notice{position:fixed;bottom:40px;right:24px;min-width:260px;max-width:340px;background:var(--white);border-radius:0;box-shadow:0 2px 10px rgba(0,0,0,.12);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;z-index:9999;transform:translateX(120%);transition:transform .3s ease-out;border:1px solid var(--border);}
+    .toast-notice.show{transform:translateX(0);}
+    .toast-notice .t-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;background:none;border-radius:0;}
+    .toast-notice.success .t-icon{color:#2e7d32;}
+    .toast-notice.error .t-icon{color:#c62828;}
+    .toast-notice .t-body{flex:1;padding-right:18px;}
+    .toast-notice .t-title{font-weight:600;color:var(--text);font-size:.85rem;margin-bottom:2px;}
+    .toast-notice .t-msg{color:var(--text-light);font-size:.8rem;line-height:1.4;}
+    .toast-notice .t-close{background:none;border:none;color:var(--text-light);cursor:pointer;padding:0;font-size:1rem;transition:color .2s;position:absolute;top:8px;right:10px;}
+    .toast-notice .t-close:hover{color:var(--text);}
+  </style>
+</head>
+<body>
+
+<!-- TOP INFO BAR -->
+<div class="top-info-bar">
+  <div class="container">
+    <div class="info-left">
+      <div class="info-item">
+        <i class="fa-solid fa-location-dot"></i>
+        <span>8CMR+GV2, rue 17.127, Pissy, Ouagadougou</span>
+      </div>
+      <div class="info-item d-none d-md-flex">
+        <i class="fa-solid fa-clock"></i>
+        <span>Lun-Jeu 08h-17h &nbsp;|&nbsp; Ven-Sam 09h-17h &nbsp;|&nbsp; Dim Fermé</span>
+      </div>
+    </div>
+    <div class="info-right">
+      <div class="info-item me-2">
+        <i class="fa-solid fa-phone"></i>
+        <a href="tel:+22676909001">+226 76 90 90 01</a>
+      </div>
+      <div class="top-auth">
+        {% if request.user.is_authenticated %}
+          <span class="auth-user-pill">
+            <i class="fa-solid fa-user-check"></i>
+            Connecté
+          </span>
+          <a href="{% url 'front:logout' %}"><i class="fa-solid fa-right-from-bracket" style="margin-right:9px;"></i>Déconnexion</a>
+        {% else %}
+          <a href="{% url 'front:login' %}"><i class="fa-solid fa-user" style="margin-right:9px;"></i>Connexion</a>
+          <a href="{% url 'front:register' %}"><i class="fa-solid fa-user-plus" style="margin-right:9px;"></i>Inscription</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="main-navbar" id="mainNav">
+  <div class="container">
+    <a href="{% url 'front:index' %}" class="navbar-brand-custom">
+      <img src="{% static 'site/img/logo.jpg' %}" alt="AIRPLUS HVAC" />
+      <div class="brand-text">AIRPLUS HVAC<small>Pièces Automobiles</small></div>
+    </a>
+    <ul class="navbar-nav-custom" id="navMenu">
+      <li><a href="#accueil" class="nav-link-custom active">Accueil</a></li>
+      <li><a href="#apropos" class="nav-link-custom">À propos</a></li>
+      <li><a href="#produits" class="nav-link-custom">Nos produits</a></li>
+      <li><a href="#" class="nav-link-custom" onclick="event.preventDefault();openDevisModal({pk:'',ref:'',name:''})">Demander un devis</a></li>
+      <li><a href="#contact" class="btn-nav-cta"><i class="fa-solid fa-comment-dots"></i><span>Nous contacter</span></a></li>
+    </ul>
+    <a href="{% url 'front:cart_detail' %}" class="nav-cart-btn" aria-label="Voir le panier">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span class="nav-cart-count" id="navCartCount">{{ cart_item_count }}</span>
+    </a>
+    <button class="mobile-toggle" onclick="toggleNav()" aria-label="Menu">
+      <i class="fa-solid fa-bars" id="navIcon"></i>
+    </button>
+  </div>
+</nav>
+
+<main>
+
+<!-- HERO SLIDER -->
+<section id="accueil" class="hero-slider">
+  <div class="slide active" style="background-image:url('https://airplus-hvac.net/static/site/img/dh10.jpg?v=1');">
+    <div class="slide-content" data-aos="fade-right" data-aos-duration="1100">
+      <span class="slide-badge">AIRPLUS HVAC  OUAGADOUGOU</span>
+      <h1 class="slide-title">Pièces Auto<br>de Qualité Supérieure</h1>
+      <p class="slide-desc">Votre spécialiste en pièces de rechange automobiles à Ouagadougou. Qualité garantie, large stock, service professionnel.</p>
+      <div class="slide-actions">
+        <a href="#produits" class="btn-slide-primary"><i class="fa-solid fa-border-all"></i> Voir notre catalogue</a>
+        <a href="#apropos" class="btn-slide-secondary"><i class="fa-solid fa-circle-info"></i> En savoir plus</a>
+      </div>
+    </div>
+  </div>
+  <div class="slide" style="background-image:url('https://airplus-hvac.net/static/site/img/dh11.jpg?v=1');">
+    <div class="slide-content">
+      <span class="slide-badge">BIENVENUE</span>
+      <h1 class="slide-title">Trouvez la Pièce<br>qu'il Vous Faut</h1>
+      <p class="slide-desc">Des centaines de références en stock. Nous équipons tous types de véhicules avec des pièces certifiées et compatibles.</p>
+      <div class="slide-actions">
+        <a href="#" onclick="event.preventDefault();openDevisModal({pk:'',ref:'',name:''})" class="btn-slide-primary"><i class="fa-solid fa-file-invoice"></i> Demander un devis</a>
+        <a href="#contact" class="btn-slide-secondary"><i class="fa-solid fa-phone"></i> Nous contacter</a>
+      </div>
+    </div>
+  </div>
+  <div class="slider-dots">
+    <div class="dot active" onclick="goToSlide(0)"></div>
+    <div class="dot" onclick="goToSlide(1)"></div>
+  </div>
+  <div class="slider-arrow prev" onclick="changeSlide(-1)"><i class="fa-solid fa-chevron-left"></i></div>
+  <div class="slider-arrow next" onclick="changeSlide(1)"><i class="fa-solid fa-chevron-right"></i></div>
+</section>
+
+<!-- À PROPOS -->
+<section id="apropos" class="about-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 order-2 order-lg-1" data-aos="fade-right" data-aos-duration="1000">
+        <div class="about-text">
+          <div class="a-label">À propos de nous</div>
+          <h2>AIRPLUS HVAC<br><span style="color:var(--text-light);font-size:1.45rem;font-weight:600;">Votre Partenaire Auto de Confiance</span></h2>
+          <p>AIRPLUS HVAC est votre spécialiste en pièces de rechange automobiles de haute qualité à Ouagadougou. Nous mettons à votre disposition un catalogue complet de pièces originales et compatibles pour tous types de véhicules.</p>
+          <p>Que vous soyez garagiste professionnel ou particulier, nous vous garantissons des produits fiables, une expertise technique et un service personnalisé pour répondre à tous vos besoins mécaniques.</p>
+          <div class="about-features">
+            <div class="feature-item"><i class="fa-solid fa-shield-halved"></i> Pièces garanties &amp; certifiées</div>
+            <div class="feature-item"><i class="fa-solid fa-boxes-stacked"></i> Large stock disponible</div>
+            <div class="feature-item"><i class="fa-solid fa-headset"></i> Conseils d'experts</div>
+            <div class="feature-item"><i class="fa-solid fa-truck"></i> Livraison rapide</div>
+            <div class="feature-item"><i class="fa-solid fa-tags"></i> Prix compétitifs</div>
+            <div class="feature-item"><i class="fa-solid fa-user-check"></i> Service professionnel</div>
+          </div>
+          <a href="#produits" class="btn-about"><i class="fa-solid fa-border-all"></i> Découvrir notre catalogue</a>
+        </div>
+      </div>
+      <div class="col-lg-6 order-1 order-lg-2 ps-0 pe-3 pe-lg-4 position-relative" data-aos="fade-left" data-aos-duration="1000">
+        <div class="about-stats-overlay d-none d-lg-flex">
+          <div class="s-num">+10</div>
+          <div class="s-txt">ANS D'EXPÉRIENCE<br>DANS LA VENTE DE<br>PIÈCES AUTOMOBILES</div>
+        </div>
+        <div class="about-image-wrap">
+          <img src="https://airplus-hvac.net/static/site/img/dh9.png?v=1" alt="AIRPLUS HVAC – Pièces automobiles" class="about-img-main" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUITS -->
+<section id="produits" class="products-section">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <div class="s-label">Notre catalogue</div>
+      <h2>Nos Produits à la Une</h2>
+      <p>Découvrez notre sélection de pièces de rechange automobiles de qualité supérieure.</p>
+    </div>
+    {% if featured_products %}
+      {% if featured_products|length >= 5 %}
+      <div class="swiper swiper-products" data-aos="fade-up" data-aos-delay="150">
+        <div class="swiper-wrapper">
+          {% for product in featured_products %}
+          <div class="swiper-slide">
+            <div class="product-card-new">
+              <div class="card-img-wrap">
+                {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.designation }}" loading="lazy" />
+                {% else %}<div class="no-img"><i class="fa-solid fa-gears"></i></div>{% endif %}
+                {% if product.quantity == 0 %}<span class="stock-badge badge-out">Épuisé</span>
+              {% elif product.is_low_stock %}<span class="stock-badge badge-low">Stock limité</span>
+              {% else %}<span class="stock-badge badge-in">En stock</span>{% endif %}
+              </div>
+              <div class="card-body-new">
+                <div class="card-ref">{{ product.reference }}</div>
+                <div class="card-name">{{ product.designation }}</div>
+                <div class="card-footer-new">
+                  <button type="button" class="btn-card-detail" title="Ajouter au panier"
+                    onclick="addToCart({{ product.pk }}, '{{ product.designation|escapejs }}')">
+                    <i class="fa-solid fa-cart-plus"></i>
+                  </button>
+                  <button type="button" class="btn-card-devis" onclick="openDevisModal({pk:{{ product.pk }},ref:'{{ product.reference|escapejs }}',name:'{{ product.designation|escapejs }}'})">
+                    <i class="fa-solid fa-file-invoice"></i> Devis
+                  </button>
+                  <button type="button" class="btn-card-detail" title="Voir le détail"
+                    onclick="openProductModal({pk:{{ product.pk }},ref:'{{ product.reference|escapejs }}',name:'{{ product.designation|escapejs }}',obs:'{{ product.observation|escapejs }}',qty:{{ product.quantity }},low:{{ product.is_low_stock|yesno:'true,false' }},img:'{% if product.image %}{{ product.image.url }}{% endif %}'})">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="swiper-pagination mt-3"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      </div>
+      {% else %}
+      <div class="row g-4" data-aos="fade-up" data-aos-delay="150">
+        {% for product in featured_products %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="product-card-new">
+            <div class="card-img-wrap">
+              {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.designation }}" loading="lazy" />
+              {% else %}<div class="no-img"><i class="fa-solid fa-gears"></i></div>{% endif %}
+              {% if product.quantity == 0 %}<span class="stock-badge badge-out">Épuisé</span>
+              {% elif product.is_low_stock %}<span class="stock-badge badge-low">Stock limité</span>
+              {% else %}<span class="stock-badge badge-in">En stock</span>{% endif %}
+            </div>
+            <div class="card-body-new">
+              <div class="card-ref">{{ product.reference }}</div>
+              <div class="card-name">{{ product.designation }}</div>
+              <div class="card-footer-new">
+                <button type="button" class="btn-card-detail" title="Ajouter au panier"
+                  onclick="addToCart({{ product.pk }}, '{{ product.designation|escapejs }}')">
+                  <i class="fa-solid fa-cart-plus"></i>
+                </button>
+                <button type="button" class="btn-card-devis" onclick="openDevisModal({pk:{{ product.pk }},ref:'{{ product.reference|escapejs }}',name:'{{ product.designation|escapejs }}'})">
+                  <i class="fa-solid fa-file-invoice"></i> Devis
+                </button>
+                <button type="button" class="btn-card-detail" title="Voir le détail"
+                  onclick="openProductModal({pk:{{ product.pk }},ref:'{{ product.reference|escapejs }}',name:'{{ product.designation|escapejs }}',obs:'{{ product.observation|escapejs }}',qty:{{ product.quantity }},low:{{ product.is_low_stock|yesno:'true,false' }},img:'{% if product.image %}{{ product.image.url }}{% endif %}'})">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="200">
+        <a href="#produits" class="btn-voir-tout"><i class="fa-solid fa-border-all"></i> Voir tous nos produits</a>
+      </div>
+    {% else %}
+    <div class="text-center py-5" data-aos="fade-up">
+      <i class="fa-solid fa-box-open" style="font-size:3.5rem;color:rgba(16,96,160,.2);"></i>
+      <p class="mt-3 text-muted">Aucun produit disponible pour le moment.</p>
+      <a href="{% url 'front:quote_request' %}" class="btn-voir-tout mt-3"><i class="fa-solid fa-file-invoice"></i> Faire une demande de devis</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- OÙ NOUS TROUVER -->
+<section id="carte" class="map-section">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <div class="s-label">Localisation</div>
+      <h2>Où Nous Trouver</h2>
+      <p>Venez nous rendre visite dans notre boutique à Pissy, Ouagadougou.</p>
+    </div>
+    <div class="row g-4 align-items-start" data-aos="fade-up" data-aos-delay="150">
+      <div class="col-lg-8">
+        <div class="map-container">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15443.37!2d-1.5737!3d12.3647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xe2ebe2caed3b1a1%3A0xcd6f2d7e0af04c11!2sPissy%2C%20Ouagadougou!5e0!3m2!1sfr!2sbf!4v1700000000000"
+            title="AIRPLUS HVAC  Pissy, Ouagadougou"
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+          <div class="map-info-overlay d-none d-md-block">
+            <h5><i class="fa-solid fa-store" style="margin-right:9px;"></i>AIRPLUS HVAC</h5>
+            <div class="mir"><i class="fa-solid fa-location-dot"></i><span>8CMR+GV2, rue 17.127<br>Pissy, Ouagadougou</span></div>
+            <hr />
+            <div class="mir"><i class="fa-solid fa-phone"></i><span>+226 76 90 90 01</span></div>
+            <hr />
+            <div class="mir"><i class="fa-solid fa-clock"></i><span>Lun-Jeu 08h-17h<br>Ven-Sam 09h-17h<br>Dim : Fermé</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="contact-info-cards">
+          <div class="info-card-item" data-aos="zoom-in" data-aos-delay="100">
+            <div class="info-card-icon"><i class="fa-solid fa-location-dot"></i></div>
+            <div><h6>Adresse</h6><p>8CMR+GV2, rue 17.127<br>Pissy, Ouagadougou</p></div>
+          </div>
+          <div class="info-card-item" data-aos="zoom-in" data-aos-delay="200">
+            <div class="info-card-icon"><i class="fa-solid fa-phone"></i></div>
+            <div><h6>Téléphone</h6><p>+226 76 90 90 01</p></div>
+          </div>
+          <div class="info-card-item" data-aos="zoom-in" data-aos-delay="300">
+            <div class="info-card-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div><h6>Horaires d'ouverture</h6><p>Lun – Jeu : 08h00 – 17h00<br>Ven – Sam : 09h00 – 17h00<br>Dimanche : Fermé</p></div>
+          </div>
+          <a href="https://maps.google.com/?q=Pissy+Ouagadougou+Burkina+Faso" target="_blank" class="info-card-item" style="text-decoration:none;background:var(--primary-light);" data-aos="zoom-in" data-aos-delay="400">
+            <div class="info-card-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+            <div><h6 style="color:var(--primary);">Itinéraire Google Maps</h6><p>Cliquez pour ouvrir dans Maps <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></p></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOUS CONTACTER -->
+<section id="contact" class="contact-section">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <div class="s-label">Message</div>
+      <h2>Nous Contacter</h2>
+      <p>Une question ? Un besoin ? Écrivez-nous et nous vous répondrons sous 24h.</p>
+    </div>
+    <div class="row g-5 align-items-stretch">
+      <div class="col-lg-7" data-aos="fade-right" data-aos-duration="900">
+        <div class="contact-form-wrapper">
+          <h3>Écrivez-nous</h3>
+          <p class="form-sub">Nous répondons sous 24h maximum</p>
+          <form id="contactForm" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label-clean" for="cNom">Nom complet *</label>
+                <input type="text" class="form-control modern-input" id="cNom" name="name" placeholder="Votre nom" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-clean" for="cEmail">Email *</label>
+                <input type="email" class="form-control modern-input" id="cEmail" name="email" placeholder="Votre email" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-clean" for="cTel">Téléphone</label>
+                <input type="tel" class="form-control modern-input" id="cTel" name="phone" placeholder="Ex : +226 70 00 00 00" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-clean" for="cSujet">Sujet</label>
+                <input type="text" class="form-control modern-input" id="cSujet" name="subject" placeholder="Objet de votre message" />
+              </div>
+            </div>
+            <div class="mt-4">
+              <label class="form-label-clean" for="cMsg">Message *</label>
+              <textarea class="form-control modern-input" id="cMsg" name="message" rows="5" placeholder="Écrivez votre message ici…" required style="margin-bottom:18px;"></textarea>
+            </div>
+            <div class="mt-4">
+              <button type="submit" class="btn-submit-contact" id="submitContactBtn">
+                <span class="btn-text"><i class="fa-solid fa-paper-plane me-2"></i> Envoyer le message</span>
+                <div class="spinner-sm spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Envoi…</span></div>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-5" data-aos="fade-left" data-aos-duration="900">
+        <div class="contact-info-cards h-100 justify-content-center" style="display:flex;flex-direction:column;gap:20px;">
+          <div class="info-card-item" data-aos="zoom-in" data-aos-delay="100">
+            <div class="info-card-icon"><i class="fa-solid fa-location-dot"></i></div>
+            <div><h6>Notre adresse</h6><p>8CMR+GV2, rue 17.127, Pissy<br>Ouagadougou, Burkina Faso</p></div>
+          </div>
+          <div class="info-card-item" data-aos="zoom-in" data-aos-delay="200">
+            <div class="info-card-icon"><i class="fa-solid fa-phone-volume"></i></div>
+            <div><h6>Téléphone</h6><p><a href="tel:+22676909001" style="color:var(--primary);font-weight:600;">+226 76 90 90 01</a></p></div>
+          </div>
+          <div class="info-card-item" data-aos="zoom-in" data-aos-delay="300">
+            <div class="info-card-icon"><i class="fa-solid fa-envelope"></i></div>
+            <div><h6>Email</h6><p>romaricthiombiano4@gmail.com</p></div>
+          </div>
+          <div class="info-card-item" data-aos="zoom-in" data-aos-delay="400">
+            <div class="info-card-icon"><i class="fa-solid fa-clock"></i></div>
+            <div><h6>Horaires d'ouverture</h6><p>Lun – Jeu : 08h00 – 17h00<br>Ven – Sam : 09h00 – 17h00<br>Dimanche : Fermé</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer-modern">
+  <div class="footer-content">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4 col-md-6" data-aos="fade-up">
+          <img src="{% static 'site/img/logo.jpg' %}" alt="AIRPLUS HVAC" class="footer-logo-img" />
+          <div class="footer-brand-name">AIRPLUS HVAC</div>
+          <div class="footer-tagline">Qualité • Fiabilité • Proximité</div>
+          <p class="footer-desc">Votre spécialiste en pièces de rechange automobiles à Ouagadougou. Pièces de qualité à prix compétitifs pour particuliers et professionnels.</p>
+          <div class="footer-social">
+            <a href="#" class="social-btn" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="social-btn" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="#" class="social-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <h4 class="footer-title"><i class="fa-solid fa-phone"></i> Contactez-nous</h4>
+          <div class="footer-contact-list">
+            <div class="footer-contact-item">
+              <div class="icon"><i class="fa-solid fa-location-dot"></i></div>
+              <div><strong>Adresse</strong><span>8CMR+GV2, rue 17.127<br>Pissy, Ouagadougou, BF</span></div>
+            </div>
+            <div class="footer-contact-item">
+              <div class="icon"><i class="fa-solid fa-phone"></i></div>
+              <div><strong>Téléphone</strong><span>+226 76 90 90 01</span></div>
+            </div>
+            <div class="footer-contact-item">
+              <div class="icon"><i class="fa-solid fa-envelope"></i></div>
+              <div><strong>Email</strong><span>romaricthiombiano4@gmail.com</span></div>
+            </div>
+            <div class="footer-contact-item">
+              <div class="icon"><i class="fa-solid fa-clock"></i></div>
+              <div><strong>Horaires</strong><span>Lun-Jeu : 08h–17h<br>Ven-Sam : 09h–17h | Dim : Fermé</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-12" data-aos="fade-up" data-aos-delay="200">
+          <h4 class="footer-title"><i class="fa-solid fa-sitemap"></i> Navigation</h4>
+          <div class="footer-nav-grid">
+            <a href="#accueil" class="footer-nav-item"><i class="fa-solid fa-house"></i> Accueil</a>
+            <a href="#apropos" class="footer-nav-item"><i class="fa-solid fa-circle-info"></i> À propos</a>
+            <a href="#produits" class="footer-nav-item"><i class="fa-solid fa-grip"></i> Nos produits</a>
+            <a href="{% url 'front:quote_request' %}" class="footer-nav-item"><i class="fa-solid fa-file-invoice"></i> Devis</a>
+            <a href="#carte" class="footer-nav-item"><i class="fa-solid fa-map"></i> Localisation</a>
+            <a href="#contact" class="footer-nav-item"><i class="fa-solid fa-comment-dots"></i> Contact</a>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:4px;padding:14px 16px;">
+            <div style="color:#fff;font-weight:700;font-size:.85rem;margin-bottom:6px;"><i class="fa-solid fa-shield-halved" style="margin-right:9px;"></i>Notre engagement</div>
+            <p style="color:rgba(255,255,255,.82);font-size:.82rem;margin:0;line-height:1.5;">Pièces certifiées · Stock permanent · Conseil personnalisé · Satisfaction garantie</p>
+          </div>
+        </div>
+      </div>
+      <hr class="footer-divider">
+      <div class="footer-bottom-bar">
+        <p><strong>&copy; {% now "Y" %} AIRPLUS HVAC</strong> — Tous droits réservés • Ouagadougou, Burkina Faso</p>
+        <p>Conçu par <a href="mailto:romaricthiombiano4@gmail.com">T.R.J</a> au Burkina Faso</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% include "site web/includes/quote_drawer.html" %}
+
+<!-- Scroll top -->
+<a href="#accueil" class="scroll-top-btn" id="scrollTopBtn" title="Retour en haut"><i class="fa-solid fa-arrow-up"></i></a>
+
+<!-- Toast -->
+<div class="toast-notice" id="toastNotice">
+  <div class="t-icon"><i id="toastIconI" class="fa-solid fa-circle-check"></i></div>
+  <div class="t-body">
+    <div class="t-title" id="toastTitle">Message envoyé !</div>
+    <div class="t-msg" id="toastMsg">Nous vous répondrons sous 24h.</div>
+  </div>
+  <button class="t-close" onclick="closeToast()"><i class="fa-solid fa-xmark"></i></button>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+  AOS.init({duration:900,once:true,offset:60});
+
+  function toggleNav(){
+    const menu=document.getElementById('navMenu');
+    const icon=document.getElementById('navIcon');
+    menu.classList.toggle('open');
+    icon.className=menu.classList.contains('open')?'fa-solid fa-xmark':'fa-solid fa-bars';
+  }
+  document.querySelectorAll('#navMenu a').forEach(l=>l.addEventListener('click',()=>{
+    document.getElementById('navMenu').classList.remove('open');
+    document.getElementById('navIcon').className='fa-solid fa-bars';
+  }));
+
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      const t=document.querySelector(a.getAttribute('href'));
+      if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
+    });
+  });
+
+  window.addEventListener('scroll',()=>{
+    const nav=document.getElementById('mainNav');
+    if(window.scrollY>80){nav.style.boxShadow='0 4px 30px rgba(0,0,0,.15)';nav.style.padding='5px 0';}
+    else{nav.style.boxShadow='0 2px 20px rgba(0,0,0,.1)';nav.style.padding='8px 0';}
+    const btn=document.getElementById('scrollTopBtn');
+    if(window.scrollY>400)btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  },{passive:true});
+
+  let currentSlide=0;
+  const slides=document.querySelectorAll('.hero-slider .slide');
+  const dots=document.querySelectorAll('.slider-dots .dot');
+  let sliderTimer;
+  function showSlide(idx){
+    slides.forEach(s=>s.classList.remove('active'));
+    dots.forEach(d=>d.classList.remove('active'));
+    currentSlide=(idx+slides.length)%slides.length;
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+  }
+  function changeSlide(dir){showSlide(currentSlide+dir);resetTimer();}
+  function goToSlide(idx){showSlide(idx);resetTimer();}
+  function resetTimer(){clearInterval(sliderTimer);sliderTimer=setInterval(()=>showSlide(currentSlide+1),7000);}
+  const heroEl=document.querySelector('.hero-slider');
+  if(heroEl){
+    heroEl.addEventListener('mouseenter',()=>clearInterval(sliderTimer));
+    heroEl.addEventListener('mouseleave',resetTimer);
+  }
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')changeSlide(-1);if(e.key==='ArrowRight')changeSlide(1);});
+  resetTimer();
+
+  const swiperEl=document.querySelector('.swiper-products');
+  if(swiperEl){
+    new Swiper('.swiper-products',{
+      slidesPerView:1,spaceBetween:20,loop:true,
+      autoplay:{delay:3500,disableOnInteraction:false},
+      pagination:{el:'.swiper-pagination',clickable:true},
+      navigation:{nextEl:'.swiper-button-next',prevEl:'.swiper-button-prev'},
+      breakpoints:{576:{slidesPerView:2},768:{slidesPerView:3},1200:{slidesPerView:4}},
+    });
+  }
+
+  document.getElementById('contactForm').addEventListener('submit',async function(e){
+    e.preventDefault();
+    const btn=document.getElementById('submitContactBtn');
+    btn.classList.add('loading');btn.disabled=true;
+    try{
+      const res=await fetch("{% url 'front:contact_send' %}",{
+        method:'POST',body:new FormData(this),
+        headers:{'X-Requested-With':'XMLHttpRequest'},
+      });
+      const data=await res.json();
+      if(data.ok){showToast('success','Message envoyé !','Nous vous répondrons dans les plus brefs délais.');this.reset();}
+      else{showToast('error','Erreur',data.error||'Une erreur est survenue.');}
+    }catch(err){showToast('error','Erreur réseau','Vérifiez votre connexion internet.');}
+    finally{btn.classList.remove('loading');btn.disabled=false;}
+  });
+
+  let toastTimeout;
+  function showToast(type,title,msg){
+    const t=document.getElementById('toastNotice');
+    t.className='toast-notice '+type;
+    document.getElementById('toastTitle').textContent=title;
+    document.getElementById('toastMsg').textContent=msg;
+      document.getElementById('toastIconI').className=type==='success'?'fa-solid fa-circle-check':'fa-solid fa-triangle-exclamation';
+    t.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout=setTimeout(closeToast,5500);
+  }
+  function closeToast(){document.getElementById('toastNotice').classList.remove('show');}
+
+  const navLinks=document.querySelectorAll('.nav-link-custom');
+  window.addEventListener('scroll',()=>{
+    const sects=['accueil','apropos','produits','carte','contact'];
+    let cur='accueil';
+    sects.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY>=(el.offsetTop-120))cur=id;});
+    navLinks.forEach(l=>{l.classList.remove('active');if(l.getAttribute('href')==='#'+cur)l.classList.add('active');});
+  },{passive:true});
+
+  const cartAddUrl='{% url "front:cart_add" %}';
+
+  /* PRODUCT MODAL */
+  let currentProductData=null;
+  function openProductModal(p){
+    currentProductData=p;
+    const m=document.getElementById('productModal');
+    const imgWrap=m.querySelector('.pmodal-img-area');
+    if(p.img){
+      imgWrap.innerHTML=`<img src="${p.img}" class="pmodal-img" alt="${p.name}">`;
+    } else {
+      imgWrap.innerHTML=`<div class="pmodal-img-placeholder"><i class="fa-solid fa-gears"></i></div>`;
+    }
+    m.querySelector('.pmodal-ref').textContent=p.ref;
+    m.querySelector('.pmodal-name').textContent=p.name;
+    m.querySelector('.pmodal-obs').textContent=p.obs||'Aucune observation renseignée.';
+    const tagEl=m.querySelector('.pmodal-stock-tag');
+    if(p.qty===0){tagEl.className='pmodal-tag tag-out';tagEl.textContent='Épuisé';}
+    else if(p.low){tagEl.className='pmodal-tag tag-low';tagEl.textContent='Stock limité';}
+    else{tagEl.className='pmodal-tag';tagEl.textContent='En stock';}
+    m.querySelector('.pmodal-qty-tag').textContent='Qté : '+p.qty;
+    m.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function closeProductModal(){
+    document.getElementById('productModal').classList.remove('open');
+    document.body.style.overflow='';
+  }
+  /* DEVIS MODAL */
+  const userIsAuth={{ request.user.is_authenticated|yesno:'true,false' }};
+  const devisAjaxUrl='{% url "front:quote_request_ajax" %}';
+  const loginUrl='{% url "front:login" %}';
+  function openDevisModal(p){
+    const m=document.getElementById('devisModal');
+    const authBlock=m.querySelector('.dmodal-auth-notice');
+    const formBlock=m.querySelector('.dmodal-form-block');
+    const hasProduct=p.pk!=='';
+    m.querySelector('.dmodal-subtitle').textContent=hasProduct?(p.ref+' – '+p.name):'';
+    m.querySelector('#dmodal-product-pk').value=p.pk||'';
+    m.querySelector('#dmodal-subject').value=hasProduct?('Devis pour '+p.ref+' – '+p.name):'Demande de devis';
+    m.querySelector('#dmodal-message').value='';
+    m.querySelector('.dmodal-msg').style.display='none';
+    m.querySelector('.dmodal-msg').className='dmodal-msg';
+    if(userIsAuth){
+      authBlock.style.display='none';
+      formBlock.style.display='block';
+    } else {
+      authBlock.style.display='block';
+      formBlock.style.display='none';
+    }
+    m.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function closeDevisModal(){
+    document.getElementById('devisModal').classList.remove('open');
+    document.body.style.overflow='';
+  }
+  function bindDevisForm(){
+  document.getElementById('devisForm').addEventListener('submit',async function(e){
+    e.preventDefault();
+    const btn=document.getElementById('dmodal-submit-btn');
+    const msgEl=document.querySelector('#devisModal .dmodal-msg');
+    const subject=document.getElementById('dmodal-subject').value.trim();
+    const message=document.getElementById('dmodal-message').value.trim();
+    const productPk=document.getElementById('dmodal-product-pk').value;
+    if(!message){msgEl.textContent='Veuillez rédiger votre message.';msgEl.className='dmodal-msg err';msgEl.style.display='block';return;}
+    btn.disabled=true;btn.textContent='Envoi…';
+    try{
+      const fd=new FormData();
+      fd.append('csrfmiddlewaretoken','{{ csrf_token }}');
+      fd.append('subject',subject);
+      fd.append('message',message);
+      fd.append('product_pk',productPk);
+      const res=await fetch(devisAjaxUrl,{method:'POST',body:fd});
+      const data=await res.json();
+      if(data.ok){
+        msgEl.textContent='Votre demande de devis a bien été envoyée !';
+        msgEl.className='dmodal-msg ok';msgEl.style.display='block';
+        document.getElementById('dmodal-message').value='';
+        setTimeout(closeDevisModal,2800);
+      } else {
+        const errMsg=data.errors?Object.values(data.errors).join(' | '):data.error||'Erreur lors de l\'envoi.';
+        msgEl.textContent=errMsg;msgEl.className='dmodal-msg err';msgEl.style.display='block';
+      }
+    }catch(err){
+      msgEl.textContent='Erreur réseau. Veuillez réessayer.';msgEl.className='dmodal-msg err';msgEl.style.display='block';
+    } finally{
+      btn.disabled=false;btn.textContent='Envoyer la demande';
+    }
+  });
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeProductModal();closeDevisModal();}});
+  }
+
+  function addToCart(productId, productName){
+    if(!userIsAuth){
+      window.location.href = loginUrl + '?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+      return;
+    }
+    const fd=new FormData();
+    fd.append('csrfmiddlewaretoken','{{ csrf_token }}');
+    fd.append('product_id',productId);
+    fd.append('quantity','1');
+    fetch(cartAddUrl,{method:'POST',body:fd,headers:{'X-Requested-With':'XMLHttpRequest'}})
+      .then(res=>res.json())
+      .then(data=>{
+        if(data.ok){
+          const c=document.getElementById('navCartCount');
+          if(c){c.textContent=data.cart_count;}
+          showToast('success','Ajouté au panier',productName+' a été ajouté à votre panier.');
+        }else if(data.login_url){
+          window.location.href=data.login_url;
+        }else{
+          showToast('error','Erreur',data.error||"Impossible d'ajouter ce produit au panier.");
+        }
+      })
+      .catch(()=>showToast('error','Erreur','Erreur réseau. Veuillez réessayer.'));
+  }
+</script>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="pmodal-backdrop" id="productModal" role="dialog" aria-modal="true">
+  <div class="pmodal-bg"></div>
+  <div class="pmodal-box">
+    <button class="pmodal-close" onclick="closeProductModal()" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+    <div class="pmodal-img-area"></div>
+    <div class="pmodal-body">
+      <div class="pmodal-ref"></div>
+      <div class="pmodal-name"></div>
+      <div class="pmodal-meta">
+        <span class="pmodal-stock-tag pmodal-tag"></span>
+        <span class="pmodal-tag pmodal-qty-tag"></span>
+      </div>
+      <div class="pmodal-obs"></div>
+    </div>
+    <div class="pmodal-footer">
+      <button type="button" class="btn-card-devis pmodal-devis-btn" style="max-width:220px" onclick="closeProductModal();openDevisModal(currentProductData)"><i class="fa-solid fa-file-invoice"></i> Demander un devis</button>
+      <button type="button" onclick="closeProductModal()" style="padding:9px 20px;background:#f4f6f9;border:1px solid var(--border);color:#555;font-size:.85rem;font-weight:600;cursor:pointer;border-radius:0;flex-shrink:0">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEVIS MODAL -->
+<div class="pmodal-backdrop" id="devisModal" role="dialog" aria-modal="true">
+  <div class="pmodal-bg"></div>
+  <div class="dmodal-box">
+    <button class="pmodal-close" onclick="closeDevisModal()" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+    <div class="dmodal-header">
+      <div class="dmodal-title"><i class="fa-solid fa-file-invoice" style="color:var(--primary);margin-right:8px"></i>Demande de devis</div>
+      <div class="dmodal-subtitle"></div>
+    </div>
+    <!-- Bloc si non connecté -->
+    <div class="dmodal-auth-notice" style="display:none">
+      <i class="fa-solid fa-lock" style="font-size:2rem;color:var(--primary);margin-bottom:12px;display:block"></i>
+      <p>Vous devez être connecté pour envoyer une demande de devis.</p>
+      <a href="{% url 'front:login' %}" class="btn-card-devis" style="display:inline-flex;margin-top:10px;max-width:200px;text-decoration:none">Se connecter</a>
+    </div>
+    <!-- Formulaire -->
+    <form id="devisForm" class="dmodal-form-block" style="display:none" novalidate>
+      <input type="hidden" id="dmodal-product-pk" name="product_pk" value="">
+      <div class="dmodal-body">
+        <div class="dmodal-msg" style="display:none"></div>
+        <div style="margin-bottom:14px">
+          <div class="dmodal-label">Objet</div>
+          <input type="text" id="dmodal-subject" name="subject" class="dmodal-input" placeholder="Objet de votre demande">
+        </div>
+        <div>
+          <div class="dmodal-label">Message <span style="color:#c62828">*</span></div>
+          <textarea id="dmodal-message" name="message" class="dmodal-input" rows="5" style="resize:vertical" placeholder="Décrivez votre demande (quantités, délais, informations complémentaires…)"></textarea>
+        </div>
+      </div>
+      <div class="dmodal-footer">
+        <button type="submit" id="dmodal-submit-btn" class="btn-card-devis" style="max-width:220px"><i class="fa-solid fa-paper-plane"></i> Envoyer la demande</button>
+        <button type="button" onclick="closeDevisModal()" style="padding:9px 20px;background:#f4f6f9;border:1px solid var(--border);color:#555;font-size:.85rem;font-weight:600;cursor:pointer;border-radius:0;flex-shrink:0">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById('productModal').addEventListener('click',function(e){
+    if(e.target===this||e.target.classList.contains('pmodal-bg'))closeProductModal();
+  });
+  document.getElementById('devisModal').addEventListener('click',function(e){
+    if(e.target===this||e.target.classList.contains('pmodal-bg'))closeDevisModal();
+  });
+  bindDevisForm();
+</script>
+
+</body>
+</html>

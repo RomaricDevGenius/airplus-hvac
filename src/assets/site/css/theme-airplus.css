@@ -1,0 +1,106 @@
+/*
+ * AIRPLUS HVAC - Harmonisation couleurs logo
+ * Bleu foncé: #1A4F8B | Bleu moyen: #007FFF | Bleu clair: #00BFFF
+ * Dégradés pour boutons et accents
+ */
+
+/* Boutons principaux - dégradé logo */
+.primary-btn,
+.btn-primary,
+.newsletter-btn,
+button.primary-btn,
+a.primary-btn {
+  background: linear-gradient(135deg, #1A4F8B 0%, #007FFF 50%, #00BFFF 100%) !important;
+  background-color: #007FFF !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(26, 79, 139, 0.35);
+}
+.primary-btn:hover,
+.primary-btn:focus,
+.btn-primary:hover,
+.btn-primary:focus,
+.newsletter-btn:hover {
+  background: linear-gradient(135deg, #0d3a6b 0%, #1A4F8B 50%, #007FFF 100%) !important;
+  opacity: 1 !important;
+  box-shadow: 0 4px 12px rgba(26, 79, 139, 0.45);
+}
+
+/* Liens et hover - bleu logo */
+a:hover,
+a:focus {
+  color: #007FFF !important;
+}
+
+/* Soulignés et barres d'accent */
+.section-title .section-nav .section-tab-nav li a:after,
+.section-tab-nav li a:hover:after,
+.section-tab-nav li a:focus:after,
+.section-tab-nav li.active a:after {
+  background: linear-gradient(90deg, #1A4F8B, #00BFFF) !important;
+}
+.section-tab-nav li.active a {
+  color: #007FFF !important;
+}
+
+/* Top header - fond dégradé bleu logo (si fond rouge actuellement) */
+#top-header {
+  background: linear-gradient(90deg, #1A4F8B 0%, #007FFF 60%, #00BFFF 100%) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Breadcrumb */
+.breadcrumb-item.active {
+  color: #007FFF !important;
+}
+#breadcrumb .breadcrumb-item a:hover {
+  color: #00BFFF !important;
+}
+
+/* Pagination et onglets */
+.pagination .page-item.active .page-link {
+  background: linear-gradient(135deg, #1A4F8B, #007FFF) !important;
+  border-color: #007FFF !important;
+}
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  color: #007FFF !important;
+  border-color: #E4E7ED #E4E7ED #fff !important;
+}
+
+/* Inputs focus / sélection */
+.input:focus,
+.input-select:focus {
+  border-color: #007FFF !important;
+  box-shadow: 0 0 0 2px rgba(0, 127, 255, 0.2) !important;
+}
+.input-radio input[type="radio"]:checked+label span,
+.input-checkbox input[type="checkbox"]:checked+label span {
+  background: linear-gradient(135deg, #1A4F8B, #007FFF) !important;
+  border-color: #007FFF !important;
+}
+
+/* Produits - prix et liens */
+.product .product-price,
+.product-body .product-price {
+  color: #007FFF !important;
+}
+.product-label.new {
+  background: linear-gradient(135deg, #1A4F8B, #00BFFF) !important;
+}
+.product-label.sale {
+  background: linear-gradient(135deg, #007FFF, #00BFFF) !important;
+}
+
+/* Footer - liens */
+#footer .footer-links a:hover {
+  color: #00BFFF !important;
+}
+
+/* Bouton recherche header */
+.header-search .search-btn {
+  background: linear-gradient(135deg, #1A4F8B, #007FFF) !important;
+  border-color: #007FFF !important;
+}
+.header-search .search-btn:hover {
+  background: linear-gradient(135deg, #0d3a6b, #1A4F8B) !important;
+}

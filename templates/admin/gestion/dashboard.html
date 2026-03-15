@@ -1,0 +1,166 @@
+{% extends layout_path %}
+{% load static i18n %}
+
+{% block title %}Tableau de bord – AIRPLUS HVAC{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold py-4 mb-4">Tableau de bord</h4>
+
+<div class="row g-4 mb-4">
+  <div class="col-xl-3 col-sm-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <span class="badge bg-label-primary rounded p-2 mb-2"><i class="ti ti-package ti-md"></i></span>
+            <h5 class="card-title mb-1">Produits</h5>
+            <h3 class="mb-0">{{ products_count }}</h3>
+          </div>
+        </div>
+        {% if perms.catalog.view_product or perms.catalog.add_product or perms.catalog.change_product or perms.catalog.delete_product %}
+        <a href="{% url 'gestion:product-list' %}" class="btn btn-sm btn-outline-primary mt-2">Voir la liste</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <span class="badge bg-label-warning rounded p-2 mb-2"><i class="ti ti-alert-triangle ti-md"></i></span>
+            <h5 class="card-title mb-1">Alerte stock</h5>
+            <h3 class="mb-0">{{ products_low_stock }}</h3>
+          </div>
+        </div>
+        {% if products_low_stock > 0 %}
+        {% if perms.catalog.view_product or perms.catalog.add_product or perms.catalog.change_product or perms.catalog.delete_product %}
+        <a href="{% url 'gestion:product-list' %}?alerte=1" class="btn btn-sm btn-outline-warning mt-2">Voir les produits</a>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <span class="badge bg-label-info rounded p-2 mb-2"><i class="ti ti-file-text ti-md"></i></span>
+            <h5 class="card-title mb-1">Devis en attente</h5>
+            <h3 class="mb-0">{{ quotes_pending }}</h3>
+          </div>
+        </div>
+        {% if perms.quotes.view_quoterequest or perms.quotes.change_quoterequest or perms.quotes.delete_quoterequest %}
+        <a href="{% url 'gestion:quote-list' %}" class="btn btn-sm btn-outline-info mt-2">Voir les devis</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <span class="badge bg-label-success rounded p-2 mb-2"><i class="ti ti-users ti-md"></i></span>
+            <h5 class="card-title mb-1">Clients</h5>
+            <h3 class="mb-0">{{ clients_count }}</h3>
+          </div>
+        </div>
+        {% if perms.clients.view_clientprofile or perms.clients.add_clientprofile or perms.clients.change_clientprofile or perms.clients.delete_clientprofile %}
+        <a href="{% url 'gestion:client-list' %}" class="btn btn-sm btn-outline-success mt-2">Voir la liste</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Produits en alerte stock</h5>
+        {% if perms.catalog.view_product or perms.catalog.change_product or perms.catalog.add_product or perms.catalog.delete_product %}
+        <a href="{% url 'gestion:product-list' %}" class="btn btn-sm btn-outline-primary">Tous les produits</a>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        {% if low_stock_products %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Référence</th>
+                <th>Désignation</th>
+                <th>Stock</th>
+                <th>Seuil</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in low_stock_products %}
+              <tr>
+                <td>{{ p.reference }}</td>
+                <td>{{ p.designation|truncatewords:5 }}</td>
+                <td><span class="badge bg-danger">{{ p.quantity }}</span></td>
+                <td>{{ p.alert_threshold }}</td>
+                <td>
+                  <a href="{% url 'gestion:stock-movement' p.pk %}" class="btn btn-sm btn-outline-secondary">Mouvement</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Aucun produit en alerte.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Dernières demandes de devis</h5>
+        {% if perms.quotes.view_quoterequest or perms.quotes.change_quoterequest or perms.quotes.delete_quoterequest %}
+        <a href="{% url 'gestion:quote-list' %}" class="btn btn-sm btn-outline-primary">Tous les devis</a>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        {% if recent_quotes %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Objet</th>
+                <th>Client</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for q in recent_quotes %}
+              <tr>
+                <td>{{ q.subject|truncatewords:4 }}</td>
+                <td>{{ q.client.get_full_name|default:q.client.username }}</td>
+                <td>{{ q.created_at|date:"d/m/Y" }}</td>
+                <td>
+                  <span class="badge {% if q.status == 'pending' %}bg-label-warning{% elif q.status == 'processed' %}bg-label-success{% elif q.status == 'sent' %}bg-label-info{% else %}bg-label-secondary{% endif %}">
+                    {{ q.get_status_display }}
+                  </span>
+                </td>
+                <td><a href="{% url 'gestion:quote-detail' q.pk %}" class="btn btn-sm btn-icon btn-outline-primary"><i class="ti ti-eye"></i></a></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Aucune demande de devis.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

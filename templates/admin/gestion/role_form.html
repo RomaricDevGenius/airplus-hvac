@@ -1,0 +1,90 @@
+{% extends layout_path %}
+{% load static i18n %}
+
+{% block title %}{% if role %}Modifier{% else %}Ajouter{% endif %} un rôle – Back-office{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h4 class="fw-bold mb-0">{% if role %}Modifier le rôle{% else %}Nouveau rôle{% endif %}</h4>
+  <a href="{% url 'gestion:role-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <form method="post" id="role-form">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label" for="id_name">Nom du rôle</label>
+          {{ form.name }}
+          {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-12">
+          <label class="form-label d-block mb-2">Permissions</label>
+          <p class="text-muted small mb-3">Cliquez sur une permission pour la sélectionner ou la désélectionner.</p>
+          {% for section_name, perms_list in permissions_grouped %}
+          <div class="mb-4">
+            <h6 class="text-uppercase text-muted small fw-semibold mb-2 pb-1 border-bottom">{{ section_name }}</h6>
+            <div class="row g-1 g-md-2">
+              {% for perm, label in perms_list %}
+              <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                <label class="permission-card d-block mb-0 rounded border p-2 text-center cursor-pointer position-relative {% if perm.pk in selected_permission_ids %}permission-card-selected border-success bg-success bg-opacity-10{% else %}border-secondary{% endif %}" data-permission-id="{{ perm.pk }}" title="{{ label }}">
+                  <input type="checkbox" name="permissions" value="{{ perm.pk }}" class="d-none permission-checkbox" {% if perm.pk in selected_permission_ids %}checked{% endif %}>
+                  <span class="permission-label small text-break">{{ label }}</span>
+                  <span class="permission-check position-absolute top-0 end-0 {% if perm.pk in selected_permission_ids %}d-inline-flex{% else %}d-none{% endif %}" title="Sélectionné">
+                    <i class="ti ti-check"></i>
+                  </span>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-muted small">Aucune permission métier disponible.</p>
+          {% endfor %}
+          {% if form.permissions.errors %}<div class="invalid-feedback d-block mt-2">{{ form.permissions.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-12 pt-2">
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <a href="{% url 'gestion:role-list' %}" class="btn btn-outline-secondary">Annuler</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .permission-card { transition: border-color .15s ease, background-color .15s ease; min-height: 2.75rem; }
+  .permission-card:hover { border-color: var(--bs-primary) !important; background-color: rgba(var(--bs-primary-rgb), 0.06); }
+  .permission-card.cursor-pointer { cursor: pointer; }
+  .permission-card-selected { border-width: 2px !important; }
+  .permission-label { font-size: 0.8rem; line-height: 1.25; display: block; }
+  .permission-check { width: 14px; height: 14px; align-items: center; justify-content: center; margin: 4px; color: var(--bs-success); font-size: 10px; line-height: 1; }
+  .permission-check i { font-size: 10px; }
+</style>
+
+<script>
+(function() {
+  document.querySelectorAll('.permission-card').forEach(function(card) {
+    card.addEventListener('click', function(e) {
+      e.preventDefault();
+      var checkbox = this.querySelector('.permission-checkbox');
+      var checkEl = this.querySelector('.permission-check');
+      if (!checkbox) return;
+      checkbox.checked = !checkbox.checked;
+      this.classList.toggle('permission-card-selected', checkbox.checked);
+      this.classList.toggle('border-success', checkbox.checked);
+      this.classList.toggle('bg-success', checkbox.checked);
+      this.classList.toggle('bg-opacity-10', checkbox.checked);
+      this.classList.toggle('border-secondary', !checkbox.checked);
+      var checkEl = this.querySelector('.permission-check');
+      if (checkbox.checked) {
+        if (checkEl) { checkEl.classList.remove('d-none'); checkEl.classList.add('d-inline-flex'); }
+      } else {
+        if (checkEl) { checkEl.classList.add('d-none'); checkEl.classList.remove('d-inline-flex'); }
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

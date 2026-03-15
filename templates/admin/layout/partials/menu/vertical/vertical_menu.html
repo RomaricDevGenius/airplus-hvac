@@ -1,0 +1,35 @@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme d-flex flex-column">
+  {% if not navbar_full %}
+  <div class="app-brand d-flex flex-column w-100 flex-shrink-0" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+    <a href="{% url 'gestion:index' %}" class="app-brand-link d-flex justify-content-center w-100 px-3 py-2">
+      <span class="app-brand-logo d-block mx-auto" style="max-width: 100%;">
+        {% include 'admin/partials/logo.html' %}
+      </span>
+    </a>
+  </div>
+  {% endif %}
+
+  <div class="menu-inner-shadow flex-shrink-0"></div>
+
+  <div class="flex-grow-1 overflow-y-auto min-h-0">
+  <ul class="menu-inner py-1">
+    {% for item in menu_data.menu %}
+    {% if "menu_header" in item %}
+      {% include './partials/menu_header_template.html' with header_text=item.menu_header %}
+    {% else %}
+      {% include './partials/menu_item_template.html' with item=item %}
+    {% endif %}
+    {% endfor %}
+  </ul>
+  <div class="menu-bottom pt-2 border-top">
+    <ul class="menu-inner py-1">
+      <li class="menu-item">
+        <a href="{% url 'gestion:logout' %}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-logout"></i>
+          <div>Déconnexion</div>
+        </a>
+      </li>
+    </ul>
+  </div>
+  </div>
+</aside>

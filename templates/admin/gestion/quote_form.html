@@ -1,0 +1,86 @@
+{% extends layout_path %}
+{% load i18n %}
+{% block title %}Modifier la demande de devis – Back-office{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">Modifier la demande de devis</h4>
+    <small class="text-muted">#{{ quote.pk }} &bull; {{ quote.subject|truncatewords:8 }}</small>
+  </div>
+  <a href="{% url 'gestion:quote-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+</div>
+
+{% if messages %}
+{% for msg in messages %}
+<div class="alert alert-{{ msg.tags }} alert-dismissible fade show mb-3" role="alert">
+  <i class="ti ti-circle-check me-1"></i>{{ msg }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="row g-4">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0"><i class="ti ti-edit me-1"></i>Informations modifiables</h6>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-4">
+            <label for="id_status" class="form-label fw-semibold">Statut</label>
+            <select name="status" id="id_status" class="form-select">
+              {% for value, label in form.fields.status.choices %}
+              <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            {% if form.status.errors %}
+            <div class="text-danger small mt-1">{{ form.status.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="mb-4">
+            <label for="id_admin_notes" class="form-label fw-semibold">Notes internes</label>
+            <textarea name="admin_notes" id="id_admin_notes" class="form-control" rows="5" placeholder="Notes visibles uniquement par le personnel back-office…">{{ form.admin_notes.value|default:"" }}</textarea>
+            <div class="form-text text-muted">Ces notes sont strictement internes, le client ne les verra pas.</div>
+            {% if form.admin_notes.errors %}
+            <div class="text-danger small mt-1">{{ form.admin_notes.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="ti ti-check me-1"></i>Enregistrer</button>
+            <a href="{% url 'gestion:quote-detail' quote.pk %}" class="btn btn-outline-secondary">Annuler</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="mb-0"><i class="ti ti-info-circle me-1"></i>Récapitulatif</h6>
+      </div>
+      <div class="card-body">
+        <table class="table table-borderless mb-0" style="font-size: 14px">
+          <tr>
+            <td class="text-muted" style="width: 90px">Client</td>
+            <td class="fw-semibold">{{ quote.client.get_full_name|default:quote.client.username }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Email</td>
+            <td><a href="mailto:{{ quote.client.email }}" class="text-truncate d-block" style="max-width: 160px">{{ quote.client.email }}</a></td>
+          </tr>
+          <tr>
+            <td class="text-muted">Objet</td>
+            <td>{{ quote.subject }}</td>
+          </tr>
+          <tr>
+            <td class="text-muted">Reçue le</td>
+            <td>{{ quote.created_at|date:"d/m/Y à H:i" }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

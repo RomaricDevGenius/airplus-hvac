@@ -1,0 +1,90 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Demande envoyée - AIRPLUS HVAC</title>
+    <link rel="icon" href="{% static 'site/img/logo.jpg' %}" type="image/jpeg" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'site/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'site/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'site/css/style.css' %}" />
+  </head>
+  <body>
+    <div id="top-header" style="background: #1e1f29; padding: 10px 0">
+      <div class="container">
+        <ul class="header-links pull-left">
+          <li><i class="fa fa-map-marker"></i> 8CMR+GV2, rue 17.127, Pissy, Ouagadougou</li>
+          <li>
+            <a href="tel:+22676909001"><i class="fa fa-phone"></i> +226 76 90 90 01</a>
+          </li>
+        </ul>
+        <ul class="header-links pull-right">
+          <li><a href="{% url 'front:index' %}">Accueil</a></li>
+          <li><a href="{% url 'front:store' %}">Boutique</a></li>
+          <li><a href="{% url 'front:logout' %}">Déconnexion</a></li>
+        </ul>
+      </div>
+    </div>
+    <header id="header" style="padding: 20px 0">
+      <div class="container">
+        <div class="header-logo text-center">
+          <a href="{% url 'front:index' %}"
+            ><img src="{% static 'site/img/logo.jpg' %}" alt="AIRPLUS HVAC" style="max-height: 70px"
+          /></a>
+        </div>
+      </div>
+    </header>
+
+    <div class="section" style="min-height: 60vh; display: flex; align-items: center">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3 text-center">
+            <div
+              style="
+                padding: 40px 30px;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+              "
+            >
+              <div
+                style="
+                  width: 70px;
+                  height: 70px;
+                  background: #e8f5e9;
+                  border-radius: 50%;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin: 0 auto 20px;
+                "
+              >
+                <i class="fa fa-check" style="font-size: 32px; color: #388e3c"></i>
+              </div>
+              <h3 style="color: #1e1f29; font-weight: 700; margin-bottom: 12px">Demande envoyée avec succès !</h3>
+              <p style="color: #666; font-size: 15px; line-height: 1.6; margin-bottom: 28px">
+                Votre demande de devis a bien été reçue par notre équipe.<br />
+                Nous vous contacterons à <strong>{{ request.user.email }}</strong> dans les plus brefs délais.
+              </p>
+              <a href="{% url 'front:index' %}" class="primary-btn" style="margin-right: 10px">Retour à l'accueil</a>
+              <a
+                href="{% url 'front:store' %}"
+                class="primary-btn"
+                style="background: #fff; color: #d32f2f; border: 1px solid #d32f2f"
+                >Continuer la boutique</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer id="footer" class="section" style="background: #1e1f29; color: #b9babc; padding: 20px 0">
+      <div class="container text-center">
+        <p>© {% now "Y" %} AIRPLUS HVAC. Tous droits réservés.</p>
+      </div>
+    </footer>
+  </body>
+</html>

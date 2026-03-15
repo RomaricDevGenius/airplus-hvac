@@ -1,0 +1,110 @@
+{% extends layout_path %}
+{% load i18n %}
+
+{% block title %}Historique – Back-office{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold py-4 mb-4">Historique</h4>
+
+<div class="row g-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Mouvements de stock</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Produit</th>
+                <th>Type</th>
+                <th>Quantité</th>
+                <th>Note</th>
+                <th>Par</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in movements %}
+              <tr>
+                <td>{{ m.created_at|date:"d/m/Y H:i" }}</td>
+                <td>{{ m.product.reference }} – {{ m.product.designation|truncatewords:4 }}</td>
+                <td><span class="badge bg-{% if m.movement_type == 'in' %}success{% else %}warning{% endif %}">{{ m.get_movement_type_display }}</span></td>
+                <td>{{ m.quantity }}</td>
+                <td>{{ m.note|default:"–" }}</td>
+                <td>{{ m.created_by.get_full_name|default:m.created_by.username|default:"–" }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="6" class="text-center text-muted">Aucun mouvement.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if page_obj.paginator.count > 0 %}
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mt-3 pt-3 border-top">
+          <p class="text-muted small mb-0">
+            Affichage {{ page_obj.start_index }}–{{ page_obj.end_index }} sur {{ page_obj.paginator.count }} mouvement{{ page_obj.paginator.count|pluralize }}
+          </p>
+          {% if page_obj.paginator.num_pages > 1 %}
+          <nav aria-label="Pagination des mouvements">
+            <ul class="pagination pagination-sm mb-0">
+              {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Précédent"><i class="ti ti-chevron-left"></i></a>
+              </li>
+              {% endif %}
+              <li class="page-item disabled">
+                <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+              </li>
+              {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Suivant"><i class="ti ti-chevron-right"></i></a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Demandes de devis récentes</h5>
+        <a href="{% url 'gestion:quote-list' %}" class="btn btn-sm btn-outline-primary">Toutes les demandes</a>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Objet</th>
+                <th>Client</th>
+                <th>Statut</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for q in recent_quotes %}
+              <tr>
+                <td>{{ q.created_at|date:"d/m/Y H:i" }}</td>
+                <td>{{ q.subject|truncatewords:5 }}</td>
+                <td>{{ q.client.get_full_name|default:q.client.username }}</td>
+                <td><span class="badge bg-label-info">{{ q.get_status_display }}</span></td>
+                <td><a href="{% url 'gestion:quote-detail' q.pk %}" class="btn btn-sm btn-icon btn-outline-primary" title="Voir"><i class="ti ti-eye"></i></a></td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="5" class="text-center text-muted">Aucune demande récente.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

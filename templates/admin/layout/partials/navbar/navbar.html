@@ -1,0 +1,236 @@
+{% load i18n %}
+{% load static %}
+
+{% if navbar_detached  %}
+<nav class="layout-navbar {{container_class}} navbar navbar-expand-xl {{navbar_detached_class}} align-items-center bg-navbar-theme" id="layout-navbar">
+  {% endif %}
+
+  {# Horizontal layout (navbar not detached) #}
+
+  {% if not navbar_detached %}
+  <nav class="layout-navbar navbar navbar-expand-xl align-items-center bg-navbar-theme" id="layout-navbar">
+    <div class="{{container_class}}">
+      {% endif %}
+      <!--  Brand demo (display only for navbar-full and hide on below xl) -->
+      {% if navbar_full %}
+      <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-4">
+        <a href="{% url 'gestion:index' %}" class="app-brand-link">
+          <span class="app-brand-logo demo">
+            {% include 'admin/partials/logo.html' %}
+          </span>
+          <span class="app-brand-text demo menu-text fw-bold">{% get_theme_variables 'template_name' %}</span>
+        </a>
+
+        {% if menu_horizontal %}
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-xl-none">
+          <i class="ti ti-x ti-md align-middle"></i>
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- ! Not required for layout-without-menu -->
+      {% if not navbar_hide_toggle %}
+      <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 {{ menu_horizontal|yesno:'d-xl-none,' }} {{ content_navbar|yesno:'d-xl-none,' }}">
+        <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+          <i class="ti ti-menu-2 ti-md"></i>
+        </a>
+      </div>
+      {% endif %}
+
+      <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+
+        <!-- Style Switcher -->
+        <div class="navbar-nav align-items-center">
+          <div class="nav-item dropdown-style-switcher dropdown me-2 me-xl-0">
+            <a class="nav-link btn btn-text-secondary btn-icon rounded-pill dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+              <i class='ti ti-md'></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-start dropdown-styles">
+              <li>
+                <a class="dropdown-item" href="javascript:void(0);" data-theme="light">
+                  <span class="align-middle"><i class='ti ti-sun ti-md me-3'></i>Light</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="javascript:void(0);" data-theme="dark">
+                  <span class="align-middle"><i class="ti ti-moon-stars ti-md me-3"></i>Dark</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="javascript:void(0);" data-theme="system">
+                  <span class="align-middle"><i class="ti ti-device-desktop-analytics ti-md me-3"></i>System</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- / Style Switcher-->
+
+        <ul class="navbar-nav flex-row align-items-center ms-auto">
+
+          <!-- Cloche notifications -->
+          {% if user.is_staff %}
+          <li class="nav-item me-2 dropdown">
+            <a class="nav-link position-relative p-2" href="javascript:void(0);" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="ti ti-bell ti-md"></i>
+              {% if notif_count > 0 %}
+              <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem;">
+                {{ notif_count }}
+              </span>
+              {% else %}
+              <span id="notif-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size:0.65rem;">0</span>
+              {% endif %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notifDropdown" style="min-width:320px;max-width:360px;">
+              <li class="px-3 py-2 d-flex justify-content-between align-items-center border-bottom">
+                <span class="fw-semibold">Notifications</span>
+                {% if notif_count > 0 %}
+                <button type="button" class="btn btn-link btn-sm p-0 text-muted notif-read-all"
+                        data-url="{% url 'gestion:notif-read-all' %}">
+                  Tout marquer lu
+                </button>
+                {% endif %}
+              </li>
+              {% if notif_recent %}
+                {% for n in notif_recent %}
+                <li>
+                  <a class="dropdown-item py-2 notif-item {% if not n.is_read %}bg-light{% endif %}"
+                     href="{% if n.link %}{{ n.link }}{% else %}javascript:void(0);{% endif %}"
+                     data-pk="{{ n.pk }}"
+                     data-url="{% url 'gestion:notif-read' pk=n.pk %}"
+                     style="white-space:normal;">
+                    <div class="d-flex gap-2 align-items-start">
+                      <span class="mt-1">
+                        {% if n.notif_type == 'stock_alert' %}
+                          <i class="ti ti-alert-triangle text-warning"></i>
+                        {% else %}
+                          <i class="ti ti-file-invoice text-info"></i>
+                        {% endif %}
+                      </span>
+                      <div>
+                        <div class="fw-medium" style="font-size:.85rem;">{{ n.title }}</div>
+                        {% if n.message %}<div class="text-muted" style="font-size:.78rem;">{{ n.message }}</div>{% endif %}
+                        <div class="text-muted" style="font-size:.72rem;">{{ n.created_at|timesince }} ago</div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+                {% endfor %}
+              {% else %}
+                <li class="px-3 py-4 text-center text-muted" style="font-size:.85rem;">
+                  <i class="ti ti-bell-off d-block mb-1" style="font-size:1.5rem;"></i>
+                  Aucune notification
+                </li>
+              {% endif %}
+            </ul>
+          </li>
+          {% endif %}
+          <!-- / Cloche notifications -->
+
+          <li class="nav-item navbar-dropdown dropdown-user dropdown">
+            <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
+              <span class="avatar avatar-online d-flex align-items-center justify-content-center bg-label-primary rounded-circle">
+                <i class="ti ti-user ti-md"></i>
+              </span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="{% url 'gestion:profile' %}">
+                  <div class="d-flex align-items-center">
+                    <span class="flex-grow-1">
+                      <span class="fw-medium d-block">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</span>
+                      {% if user.email %}<small class="text-muted">{{ user.email }}</small>{% endif %}
+                    </span>
+                  </div>
+                </a>
+              </li>
+              <li><div class="dropdown-divider"></div></li>
+              <li>
+                <a class="dropdown-item" href="{% url 'gestion:profile' %}">
+                  <i class="ti ti-user me-3 ti-md"></i>
+                  <span class="align-middle">Mon profil</span>
+                </a>
+              </li>
+              <li><div class="dropdown-divider"></div></li>
+              <li>
+                <a class="dropdown-item" href="{% url 'gestion:logout' %}">
+                  <i class="ti ti-logout me-3 ti-md"></i>
+                  <span class="align-middle">Déconnexion</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+
+      </div>
+      {% if not navbar_detached %}
+    </div>
+  </nav>
+  {% endif %}
+
+<script>
+(function () {
+  'use strict';
+
+  function getCsrf() {
+    var name = 'csrftoken';
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var c = cookies[i].trim();
+      if (c.startsWith(name + '=')) return decodeURIComponent(c.slice(name.length + 1));
+    }
+    return '';
+  }
+
+  function updateBadge(count) {
+    var badge = document.getElementById('notif-badge');
+    if (!badge) return;
+    if (count > 0) {
+      badge.textContent = count;
+      badge.classList.remove('d-none');
+    } else {
+      badge.classList.add('d-none');
+    }
+  }
+
+  /* Mark single notification as read */
+  document.addEventListener('click', function (e) {
+    var item = e.target.closest('.notif-item');
+    if (!item) return;
+    var url = item.dataset.url;
+    if (!url) return;
+    fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCsrf(), 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (r) { return r.json(); }).then(function () {
+      item.classList.remove('bg-light');
+      var badge = document.getElementById('notif-badge');
+      var current = badge ? (parseInt(badge.textContent) || 0) : 0;
+      updateBadge(Math.max(0, current - 1));
+    }).catch(function () {});
+  });
+
+  /* Mark all as read */
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.notif-read-all');
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    fetch(btn.dataset.url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCsrf(), 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (r) { return r.json(); }).then(function () {
+      updateBadge(0);
+      document.querySelectorAll('.notif-item').forEach(function (el) {
+        el.classList.remove('bg-light');
+      });
+      btn.remove();
+    }).catch(function () {});
+  });
+})();
+</script>
+
+  {% if navbar_detached %}
+</nav>
+{% endif %}

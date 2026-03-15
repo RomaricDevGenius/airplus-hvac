@@ -1,0 +1,127 @@
+{% load static %}
+
+<!doctype html>
+
+<html
+  lang="en"
+  class="{{style}}-style {{navbar_type_class}} {{header_type_class}} {{menu_fixed_class}} {{menu_collapsed_class}} {{footer_fixed_class}} {{display_customizer_class}} {{content_layout_class}}"
+  dir="{{text_direction_value}}"
+  data-theme="{{theme}}"
+  data-assets-path="{% static '/' %}"
+  data-base-url="{{url}}"
+  data-framework="django"
+  data-template="{{ menu_horizontal|yesno:'horizontal,vertical' }}-menu-{{ is_front|yesno:'front,' }}-{{ theme }}-{{style}}"
+>
+  <head>
+    <title>
+      {% block title %}{% endblock title %} | {% get_theme_variables 'template_name' %} - {% get_theme_variables 'template_suffix' %}
+    </title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <meta name="description" content="{% get_theme_variables 'template_description' %}" />
+    <meta name="keywords" content="{% get_theme_variables 'template_keyword' %}" />
+    <!-- Canonical SEO -->
+    <link rel="canonical" href="{% get_theme_variables 'product_page' %}" />
+    <!-- Favicon : logo entreprise -->
+    <link rel="icon" href="{% static 'site/img/logo.jpg' %}" type="image/jpeg" />
+
+    <!-- Include the styles partial -->
+    {% include is_front|yesno:"./partials/styles_front.html,./partials/styles.html" %}
+    {% block vendor_css %}{% endblock vendor_css %}
+
+    <!--Page CSS-->
+    {% block page_css %}{% endblock page_css %}
+
+    <!-- AIRPLUS HVAC color overrides -->
+    <style>
+      /* PRIMARY */
+      .text-primary {
+        color: #1060a0 !important;
+      }
+      .bg-primary {
+        background-color: #1060a0 !important;
+      }
+      .border-primary {
+        border-color: #1060a0 !important;
+      }
+      .btn-primary {
+        --bs-btn-bg: #1060a0;
+        --bs-btn-border-color: #1060a0;
+        --bs-btn-hover-bg: #2196f3;
+        --bs-btn-hover-border-color: #2196f3;
+        --bs-btn-active-bg: #2196f3;
+        --bs-btn-active-border-color: #2196f3;
+        --bs-btn-color: #fff;
+        --bs-btn-hover-color: #fff;
+        --bs-btn-active-color: #fff;
+        background-color: #1060a0 !important;
+        border-color: #1060a0 !important;
+        color: #fff !important;
+      }
+      .btn-primary:hover,
+      .btn-primary:focus,
+      .btn-primary:active {
+        background-color: #2196f3 !important;
+        border-color: #2196f3 !important;
+        color: #fff !important;
+      }
+      .btn-outline-primary {
+        --bs-btn-color: #1060a0;
+        --bs-btn-border-color: #1060a0;
+        --bs-btn-hover-bg: #1060a0;
+        --bs-btn-hover-border-color: #1060a0;
+        --bs-btn-hover-color: #fff;
+        --bs-btn-active-bg: #1060a0;
+        --bs-btn-active-border-color: #1060a0;
+        --bs-btn-active-color: #fff;
+        color: #1060a0 !important;
+        border-color: #1060a0 !important;
+        background: transparent !important;
+      }
+      .btn-outline-primary:hover,
+      .btn-outline-primary:focus,
+      .btn-outline-primary:active {
+        background-color: #1060a0 !important;
+        border-color: #1060a0 !important;
+        color: #fff !important;
+      }
+      .bg-label-primary {
+        background-color: #e8f2fb !important;
+        color: #1060a0 !important;
+      }
+      .badge.bg-primary {
+        background-color: #1060a0 !important;
+      }
+      a {
+        color: #1060a0;
+      }
+      a:hover {
+        color: #2196f3;
+      }
+      .form-control:focus,
+      .form-select:focus {
+        border-color: #1060a0 !important;
+        box-shadow: 0 0 0 0.2rem rgba(16, 96, 160, 0.18) !important;
+      }
+    </style>
+
+    <!-- Include the scripts partial (required ) -->
+    {% include is_front|yesno:"./partials/scripts_includes_front.html,./partials/scripts_includes.html" %}
+  </head>
+
+  <body>
+    <!-- beautify ignore:end -->
+
+    {% block layout %} {% endblock layout %}
+    {% include is_front|yesno:"./partials/scripts_front.html,./partials/scripts.html" %}
+
+    <!--Vendors Javascript-->
+    {% block vendor_js %} {% endblock vendor_js %}
+
+    <!--Page Javascript-->
+    {% block page_js %} {% endblock page_js %}
+  </body>
+</html>

@@ -1,0 +1,42 @@
+{% extends layout_path %}
+{% load i18n %}
+
+{% block title %}Mouvement de stock – {{ product.reference }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h4 class="fw-bold mb-0">Mouvement de stock</h4>
+  <a href="{% url 'gestion:product-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <p><strong>Produit :</strong> {{ product.reference }} – {{ product.designation }}</p>
+    <p><strong>Stock actuel :</strong> {{ product.quantity }}</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="id_movement_type">Type</label>
+          <select name="movement_type" id="id_movement_type" class="form-select" required>
+            <option value="in">Entrée</option>
+            <option value="out" selected>Sortie</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="id_quantity">Quantité</label>
+          <input type="number" name="quantity" id="id_quantity" class="form-control" value="1" min="1" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="id_note">Motif / note</label>
+          <input type="text" name="note" id="id_note" class="form-control" maxlength="255" placeholder="Ex. : Vente, Réception, Correction...">
+        </div>
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Enregistrer le mouvement</button>
+          <a href="{% url 'gestion:product-list' %}" class="btn btn-outline-secondary">Annuler</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

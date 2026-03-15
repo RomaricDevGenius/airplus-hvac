@@ -1,0 +1,171 @@
+{% extends "admin/layout/layout_blank.html" %}
+{% load static i18n %}
+{% block title %}Connexion – AIRPLUS HVAC{% endblock %}
+{% block vendor_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+{% endblock %}
+{% block page_css %}
+<style>
+  body {
+    background: #f0f4f8 !important;
+  }
+  .layout-wrapper {
+    background: #f0f4f8 !important;
+  }
+  .login-card {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 4px 24px rgba(16, 96, 160, 0.13);
+    width: 100%;
+    max-width: 520px;
+    padding: 30px 42px;
+    border-top: none;
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .login-logo img {
+    height: 72px;
+    width: auto;
+  }
+  .login-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 1.45rem;
+    color: #1060a0;
+    text-align: center;
+    margin-bottom: 3px;
+  }
+  .login-subtitle {
+    text-align: center;
+    color: #606060;
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+  .login-divider {
+    border: none;
+    border-top: 1px solid #e0e8f0;
+    margin: 0 0 18px;
+  }
+  .login-card .form-label {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  .login-card .form-control {
+    border: 1px solid #c8d8e8;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    padding: 9px 13px;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+  .login-card .form-control:focus {
+    border-color: #1060a0;
+    box-shadow: 0 0 0 3px rgba(16, 96, 160, 0.1);
+  }
+  .btn-login {
+    width: 100%;
+    padding: 11px;
+    background: #1060a0;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.25s;
+    margin-top: 6px;
+  }
+  .btn-login:hover {
+    background: #0a4d85;
+    color: #fff;
+  }
+  .login-links {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 0.84rem;
+    color: #606060;
+  }
+  .login-links a {
+    color: #1060a0;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .login-links a:hover {
+    color: #2196f3;
+  }
+  .login-links .sep {
+    margin: 0 8px;
+    color: #ccc;
+  }
+  .forgot-link {
+    font-size: 0.8rem;
+    color: #2196f3;
+    text-decoration: none;
+  }
+  .forgot-link:hover {
+    color: #1060a0;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 88vh; padding: 30px 16px">
+  <div class="login-card">
+    <div class="login-logo">
+      <a href="{% url 'front:index' %}"><img src="{% static 'site/img/logo.jpg' %}" alt="AIRPLUS HVAC" /></a>
+    </div>
+    <div class="login-title">AIRPLUS HVAC</div>
+    <div class="login-subtitle">Connexion – Personnel et Clients</div>
+    <hr class="login-divider" />
+
+    {% if messages %} {% for message in messages %}
+    <div
+      class="alert alert-{{ message.tags }} alert-dismissible py-2 px-3"
+      role="alert"
+      style="font-size: 0.85rem; border-radius: 4px"
+    >
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %} {% endif %} {% if form.errors or form.non_field_errors %}
+    <div class="alert alert-danger py-2 px-3" role="alert" style="font-size: 0.85rem; border-radius: 4px">
+      {% if form.non_field_errors %}{{ form.non_field_errors.0 }}{% else %}Email ou mot de passe incorrect.{% endif %}
+    </div>
+    {% endif %}
+
+    <form method="post" action="">
+      {% csrf_token %} {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+      {% endif %}
+      <div class="mb-2">
+        <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+        {{ form.username }} {% if form.username.errors %}
+        <div class="invalid-feedback d-block" style="font-size: 0.8rem">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="mb-1">
+        <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+        {{ form.password }} {% if form.password.errors %}
+        <div class="invalid-feedback d-block" style="font-size: 0.8rem">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="text-end mb-3">
+        <a href="{% url 'password_reset' %}" class="forgot-link">Mot de passe oublié ?</a>
+      </div>
+      <button type="submit" class="btn-login">
+        <i class="fa-solid fa-right-to-bracket" style="margin-right: 8px"></i>Se connecter
+      </button>
+    </form>
+
+    <div class="login-links">
+      <a href="{% url 'front:index' %}">Retour au site</a>
+      <span class="sep">·</span>
+      <a href="{% url 'front:register' %}">Créer un compte</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

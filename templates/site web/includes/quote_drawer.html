@@ -1,0 +1,493 @@
+<!-- MODALE DEVIS — DEMANDE DE DEVIS -->
+
+<!-- Overlay -->
+<div id="qd-overlay"></div>
+
+<!-- Modale centrée -->
+<div id="qd-modal" role="dialog" aria-modal="true" aria-label="Demande de devis">
+  <div class="qd-card">
+    <!-- En-tête -->
+    <div class="qd-header">
+      <div class="qd-header-left">
+        <span class="qd-icon"><i class="fa fa-file-text-o"></i></span>
+        <div>
+          <div class="qd-title">Demande de devis</div>
+          <div id="qd-product-label" class="qd-subtitle">Produit sélectionné</div>
+        </div>
+      </div>
+      <button id="qd-close" class="qd-close" aria-label="Fermer">&times;</button>
+    </div>
+
+    <div class="qd-divider"></div>
+
+    <!-- Zone formulaire -->
+    <div id="qd-form-area" class="qd-body">
+      <form id="qd-form" novalidate>
+        <input type="hidden" id="qd-product-pk" name="product_pk" />
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+
+        <div class="qd-field">
+          <label class="qd-label" for="qd-subject">Objet</label>
+          <input type="text" id="qd-subject" name="subject" class="qd-input" placeholder="Objet de votre demande" />
+          <span class="qd-field-error" id="err-subject"></span>
+        </div>
+
+        <div class="qd-field">
+          <label class="qd-label" for="qd-message">Message</label>
+          <textarea
+            id="qd-message"
+            name="message"
+            rows="5"
+            class="qd-input"
+            placeholder="Décrivez votre demande : quantités, délais, informations complémentaires…"
+          ></textarea>
+          <span class="qd-field-error" id="err-message"></span>
+        </div>
+
+        <div id="qd-global-error" class="qd-global-error" style="display: none"></div>
+
+        <button type="submit" id="qd-submit" class="qd-btn-submit">
+          <span id="qd-btn-text"><i class="fa fa-paper-plane"></i>&nbsp; Envoyer la demande</span>
+          <span id="qd-btn-loader" style="display: none"> <span class="qd-spinner"></span> Envoi en cours… </span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Zone succès -->
+    <div id="qd-success-area" class="qd-body" style="display: none">
+      <div class="qd-success-box">
+        <div class="qd-success-icon"><i class="fa fa-check"></i></div>
+        <h3 class="qd-success-title">Demande envoyée !</h3>
+        <p class="qd-success-text">
+          Votre demande a bien été transmise à notre équipe.<br />Nous vous répondrons dans les plus brefs délais.
+        </p>
+      </div>
+    </div>
+
+    <!-- Pied -->
+    <div class="qd-footer"><i class="fa fa-lock"></i> Vos informations sont confidentielles et sécurisées.</div>
+  </div>
+</div>
+
+<style>
+  /* ── OVERLAY ───────────────────────────────────────────── */
+  #qd-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 8, 18, 0.58);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 9000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  #qd-overlay.qd-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ── MODALE CENTRÉE ────────────────────────────────────── */
+  #qd-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    pointer-events: none;
+  }
+  .qd-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.22),
+      0 4px 16px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+    transition:
+      opacity 0.28s ease,
+      transform 0.3s cubic-bezier(0.34, 1.3, 0.64, 1);
+    pointer-events: none;
+  }
+  #qd-modal.qd-open .qd-card {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+  }
+
+  /* ── HEADER ────────────────────────────────────────────── */
+  .qd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #f0f0f4;
+    flex-shrink: 0;
+  }
+  .qd-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .qd-icon {
+    width: 40px;
+    height: 40px;
+    background: #e6f0fa;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1060A0;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+  .qd-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a1a2e;
+    line-height: 1.2;
+  }
+  .qd-subtitle {
+    font-size: 12px;
+    color: #7a8aa0;
+    font-weight: 500;
+    margin-top: 2px;
+    max-width: 340px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .qd-close {
+    width: 34px;
+    height: 34px;
+    background: #f4f4f6;
+    border: none;
+    border-radius: 50%;
+    font-size: 21px;
+    line-height: 1;
+    color: #666;
+    cursor: pointer;
+    transition:
+      background 0.18s,
+      color 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .qd-close:hover {
+    background: #ddeaf7;
+    color: #1060A0;
+  }
+
+  /* ── DIVIDER ───────────────────────────────────────────── */
+  .qd-divider {
+    height: 1px;
+    background: #f0f0f4;
+    flex-shrink: 0;
+  }
+
+  /* ── BODY ──────────────────────────────────────────────── */
+  .qd-body {
+    padding: 24px 24px 20px;
+    overflow-y: auto;
+  }
+
+  /* ── FIELDS ────────────────────────────────────────────── */
+  .qd-field {
+    margin-bottom: 18px;
+  }
+  .qd-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: #888;
+    margin-bottom: 7px;
+  }
+  .qd-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #e2e5f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1a1a2e;
+    background: #fafbfe;
+    box-sizing: border-box;
+    font-family: inherit;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+    resize: vertical;
+    outline: none;
+  }
+  .qd-input:focus {
+    border-color: #1060A0;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(16, 96, 160, 0.12);
+  }
+  .qd-input.qd-invalid {
+    border-color: #e74c3c;
+  }
+  .qd-field-error {
+    display: block;
+    font-size: 12px;
+    color: #e74c3c;
+    margin-top: 4px;
+    min-height: 15px;
+  }
+  .qd-global-error {
+    background: #fff0ee;
+    border: 1px solid #f5c6c0;
+    border-radius: 7px;
+    padding: 10px 14px;
+    color: #c0392b;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  /* ── SUBMIT ────────────────────────────────────────────── */
+  .qd-btn-submit {
+    width: 100%;
+    padding: 13px;
+    background: #1060A0;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      box-shadow 0.2s;
+  }
+  .qd-btn-submit:hover:not(:disabled) {
+    background: #0a4d85;
+    box-shadow: 0 4px 16px rgba(16, 96, 160, 0.25);
+  }
+  .qd-btn-submit:disabled {
+    opacity: 0.65;
+    cursor: default;
+  }
+
+  /* ── SPINNER ───────────────────────────────────────────── */
+  .qd-spinner {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: qd-spin 0.7s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes qd-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ── SUCCESS ───────────────────────────────────────────── */
+  .qd-success-box {
+    text-align: center;
+    padding: 8px 0 4px;
+  }
+  .qd-success-icon {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    box-shadow: 0 8px 24px rgba(39, 174, 96, 0.28);
+  }
+  .qd-success-icon i {
+    color: #fff;
+    font-size: 32px;
+  }
+  .qd-success-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+  }
+  .qd-success-text {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.65;
+    margin-bottom: 26px;
+  }
+  .qd-btn-ghost {
+    display: block;
+    width: 100%;
+    padding: 11px;
+    background: transparent;
+    color: #888;
+    border: 1.5px solid #e8e8ee;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+    margin-top: 8px;
+  }
+  .qd-btn-ghost:hover {
+    border-color: #bbb;
+    color: #444;
+  }
+
+  /* ── FOOTER ────────────────────────────────────────────── */
+  .qd-footer {
+    padding: 12px 24px;
+    font-size: 11.5px;
+    color: #b0b8c4;
+    border-top: 1px solid #f0f0f4;
+    background: #fafbfe;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .qd-footer i {
+    margin-right: 4px;
+    color: #27ae60;
+  }
+
+  /* ── RESPONSIVE ────────────────────────────────────────── */
+  @media (max-width: 560px) {
+    #qd-modal {
+      align-items: flex-end;
+      padding: 0;
+    }
+    .qd-card {
+      border-radius: 14px 14px 0 0;
+      max-width: 100%;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+  	var overlay   = document.getElementById('qd-overlay');
+  	var modal     = document.getElementById('qd-modal');
+  	var btnClose  = document.getElementById('qd-close');
+  	var form      = document.getElementById('qd-form');
+  	var pkInput   = document.getElementById('qd-product-pk');
+  	var subject   = document.getElementById('qd-subject');
+  	var message   = document.getElementById('qd-message');
+  	var label     = document.getElementById('qd-product-label');
+  	var formArea  = document.getElementById('qd-form-area');
+  	var succArea  = document.getElementById('qd-success-area');
+  	var submitBtn = document.getElementById('qd-submit');
+  	var btnText   = document.getElementById('qd-btn-text');
+  	var btnLoader = document.getElementById('qd-btn-loader');
+  	var globalErr = document.getElementById('qd-global-error');
+  	var errSubj   = document.getElementById('err-subject');
+  	var errMsg    = document.getElementById('err-message');
+  	var AJAX_URL  = '{% url "front:quote_request_ajax" %}';
+  	var IS_AUTH   = {{ request.user.is_authenticated|yesno:'true,false' }};
+  	var LOGIN_URL = '{% url "front:login" %}';
+
+  	function openModal(pk, ref, name) {
+  		if (!IS_AUTH) {
+  			window.location.href = LOGIN_URL + '?next=' + encodeURIComponent(window.location.pathname);
+  			return;
+  		}
+  		pkInput.value = pk;
+  		label.textContent = ref + ' — ' + name;
+  		subject.value = 'Devis pour ' + ref + ' – ' + name;
+  		message.value = '';
+  		clearErrors();
+  		formArea.style.display = '';
+  		succArea.style.display = 'none';
+  		overlay.classList.add('qd-visible');
+  		modal.classList.add('qd-open');
+  		document.body.style.overflow = 'hidden';
+  		setTimeout(function () { message.focus(); }, 320);
+  	}
+
+  	function closeModal() {
+  		if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
+  		overlay.classList.remove('qd-visible');
+  		modal.classList.remove('qd-open');
+  		document.body.style.overflow = '';
+  	}
+
+  	function clearErrors() {
+  		errSubj.textContent = '';
+  		errMsg.textContent = '';
+  		globalErr.style.display = 'none';
+  		globalErr.textContent = '';
+  		subject.classList.remove('qd-invalid');
+  		message.classList.remove('qd-invalid');
+  	}
+
+  	function setLoading(on) {
+  		submitBtn.disabled = on;
+  		btnText.style.display = on ? 'none' : '';
+  		btnLoader.style.display = on ? '' : 'none';
+  	}
+
+  	document.querySelectorAll('.open-quote-drawer').forEach(function (btn) {
+  		btn.addEventListener('click', function () {
+  			openModal(this.dataset.pk, this.dataset.ref, this.dataset.name);
+  		});
+  	});
+
+  	btnClose.addEventListener('click', closeModal);
+  	overlay.addEventListener('click', closeModal);
+  	document.addEventListener('keydown', function (e) {
+  		if (e.key === 'Escape') closeModal();
+  	});
+
+  	var autoCloseTimer = null;
+
+  	form.addEventListener('submit', function (e) {
+  		e.preventDefault();
+  		clearErrors();
+  		setLoading(true);
+
+  		fetch(AJAX_URL, {
+  			method: 'POST',
+  			body: new FormData(form),
+  			headers: { 'X-Requested-With': 'XMLHttpRequest' }
+  		})
+  		.then(function (res) {
+  			return res.json().then(function (json) { return { ok: res.ok, data: json }; });
+  		})
+  		.then(function (result) {
+  			setLoading(false);
+  			if (result.data.ok) {
+  				formArea.style.display = 'none';
+  				succArea.style.display = '';
+  				autoCloseTimer = setTimeout(function () { closeModal(); }, 3200);
+  			} else if (result.data.errors) {
+  				var errs = result.data.errors;
+  				if (errs.subject) { errSubj.textContent = errs.subject; subject.classList.add('qd-invalid'); }
+  				if (errs.message) { errMsg.textContent  = errs.message; message.classList.add('qd-invalid'); }
+  			} else {
+  				globalErr.textContent = result.data.error || 'Une erreur est survenue. Veuillez réessayer.';
+  				globalErr.style.display = '';
+  			}
+  		})
+  		.catch(function () {
+  			setLoading(false);
+  			globalErr.textContent = 'Erreur réseau. Vérifiez votre connexion et réessayez.';
+  			globalErr.style.display = '';
+  		});
+  	});
+  }());
+</script>

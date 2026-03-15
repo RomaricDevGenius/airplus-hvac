@@ -1,0 +1,80 @@
+{% extends layout_path %}
+{% load i18n %}
+
+{% block title %}Client – {{ client.user.get_full_name|default:client.user.username }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h4 class="fw-bold mb-0">Fiche client</h4>
+  <div class="d-flex flex-wrap gap-2">
+    {% if perms.clients.change_clientprofile %}
+    <a href="{% url 'gestion:client-update' client.pk %}" class="btn btn-primary">Modifier</a>
+    {% endif %}
+    {% if perms.clients.delete_clientprofile %}
+    <a href="{% url 'gestion:client-delete' client.pk %}" class="btn btn-outline-danger">Supprimer</a>
+    {% endif %}
+    <a href="{% url 'gestion:client-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-12">
+    <div class="card h-100">
+      <div class="card-header d-flex align-items-center">
+        <div class="avatar avatar-lg me-3 bg-label-primary rounded">
+          <span class="avatar-initial rounded">{{ client.user.get_full_name|default:client.user.username|slice:":1"|upper }}</span>
+        </div>
+        <div>
+          <h5 class="card-title mb-1">{{ client.user.get_full_name|default:client.user.username }}</h5>
+          <p class="text-muted mb-0 small">{{ client.user.email }}</p>
+          {% if client.company_name %}<p class="text-muted mb-0 small">{{ client.company_name }}</p>{% endif %}
+        </div>
+      </div>
+      <div class="card-body">
+        <h6 class="text-muted text-uppercase small fw-semibold mb-3">Informations de contact</h6>
+        <ul class="list-unstyled mb-0">
+          <li class="d-flex align-items-center mb-2">
+            <i class="ti ti-mail me-2 text-muted"></i>
+            <span>{{ client.user.email|default:"–" }}</span>
+          </li>
+          <li class="d-flex align-items-center mb-2">
+            <i class="ti ti-phone me-2 text-muted"></i>
+            <span>{{ client.phone|default:"–" }}</span>
+          </li>
+          <li class="d-flex align-items-start mb-2">
+            <i class="ti ti-map-pin me-2 text-muted mt-1"></i>
+            <span>{{ client.address|default:"–"|linebreaksbr }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="text-muted text-uppercase small fw-semibold mb-3">Compte</h6>
+        <div class="row g-3">
+          <div class="col-sm-6 col-md-4">
+            <div class="border rounded p-3">
+              <span class="d-block small text-muted">Identifiant de connexion</span>
+              <span class="fw-medium">{{ client.user.username }}</span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-4">
+            <div class="border rounded p-3">
+              <span class="d-block small text-muted">Inscrit le</span>
+              <span class="fw-medium">{{ client.created_at|date:"d/m/Y à H:i" }}</span>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-4">
+            <div class="border rounded p-3">
+              <span class="d-block small text-muted">Dernière mise à jour</span>
+              <span class="fw-medium">{{ client.updated_at|date:"d/m/Y à H:i" }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

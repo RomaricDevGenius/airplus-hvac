@@ -1,0 +1,95 @@
+{% extends layout_path %}
+{% load static i18n %}
+
+{% block title %}Mon profil – Back-office{% endblock %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <h4 class="fw-bold mb-0">Mon profil</h4>
+    <a href="{% url 'gestion:index' %}" class="btn btn-outline-secondary">
+      <i class="ti ti-arrow-left ti-sm me-1"></i> Retour au tableau de bord
+    </a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-transparent border-bottom py-3">
+          <h5 class="card-title mb-0 text-muted text-uppercase small fw-semibold">Informations personnelles</h5>
+        </div>
+        <div class="card-body p-4">
+          <dl class="row mb-0">
+            <dt class="col-sm-4 text-muted fw-normal mb-2">Email</dt>
+            <dd class="col-sm-8 mb-2">{{ admin_user.email|default:"–" }}</dd>
+
+            <dt class="col-sm-4 text-muted fw-normal mb-2">Rôle</dt>
+            <dd class="col-sm-8 mb-2">
+              {% if admin_user.groups.all %}
+                {% for g in admin_user.groups.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+              {% elif admin_user.is_superuser %}
+                Administrateur
+              {% else %}
+                Personnel
+              {% endif %}
+            </dd>
+
+            <dt class="col-sm-4 text-muted fw-normal mb-0">Dernière connexion</dt>
+            <dd class="col-sm-8 mb-0">{{ admin_user.last_login|date:"d/m/Y H:i"|default:"–" }}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-transparent border-bottom py-3">
+          <h5 class="card-title mb-0 text-muted text-uppercase small fw-semibold">Sécurité</h5>
+        </div>
+        <div class="card-body p-4">
+          <p class="text-muted small mb-3">Modifiez votre mot de passe régulièrement pour sécuriser votre compte.</p>
+          <a href="{% url 'gestion:password_change' %}" class="btn btn-outline-primary w-100">
+            <i class="ti ti-lock ti-sm me-2"></i> Modifier le mot de passe
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mt-4">
+    <div class="card-header bg-transparent border-bottom py-3">
+      <h5 class="card-title mb-0 text-muted text-uppercase small fw-semibold">Changer l’email de connexion</h5>
+    </div>
+    <div class="card-body p-4">
+      <div class="alert alert-light border mb-4" role="status">
+        <strong>Principe :</strong> Ce formulaire permet de modifier l’adresse email avec laquelle vous vous connectez au back-office.
+        Après enregistrement, l’email affiché dans <strong>Informations personnelles</strong> sera mis à jour et vous devrez utiliser ce nouvel email (avec le même mot de passe) pour vous connecter.
+        Vous devez saisir votre <strong>mot de passe actuel</strong> pour confirmer que c’est bien vous et valider la modification.
+      </div>
+      <form method="post" action="{% url 'gestion:profile' %}" class="row g-3">
+        {% csrf_token %}
+        <div class="col-12 col-md-5">
+          <label for="id_new_email" class="form-label">{{ email_form.new_email.label }}</label>
+          {{ email_form.new_email }}
+          {% if email_form.new_email.errors %}
+            <div class="invalid-feedback d-block">{{ email_form.new_email.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="col-12 col-md-5">
+          <label for="id_password_confirm" class="form-label">{{ email_form.password_confirm.label }}</label>
+          {{ email_form.password_confirm }}
+          {% if email_form.password_confirm.errors %}
+            <div class="invalid-feedback d-block">{{ email_form.password_confirm.errors.0 }}</div>
+          {% endif %}
+          {% if email_form.password_confirm.help_text %}
+            <div class="form-text">{{ email_form.password_confirm.help_text }}</div>
+          {% endif %}
+        </div>
+        <div class="col-12 col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

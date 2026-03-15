@@ -1,0 +1,109 @@
+{% extends layout_path %}
+{% load i18n %}
+
+{% block title %}Demandes de devis – Back-office{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <h4 class="fw-bold mb-0">Demandes de devis</h4>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Objet</th>
+            <th>Client</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if perms.quotes.view_quoterequest %}
+            {% for q in quotes %}
+            <tr>
+              <td>{{ q.subject|truncatewords:6 }}</td>
+              <td>{{ q.client.get_full_name|default:q.client.username }}</td>
+              <td>{{ q.created_at|date:"d/m/Y H:i" }}</td>
+              <td>
+                <span class="badge {% if q.status == 'pending' %}bg-label-warning{% elif q.status == 'processed' %}bg-label-success{% else %}bg-label-secondary{% endif %}">
+                  {{ q.get_status_display }}
+                </span>
+              </td>
+              <td class="text-end">
+                <div class="d-flex justify-content-end gap-1">
+                  <a href="{% url 'gestion:quote-detail' q.pk %}" class="btn btn-sm btn-icon btn-outline-primary" title="Voir">
+                    <i class="ti ti-eye"></i>
+                  </a>
+                  {% if perms.quotes.change_quoterequest %}
+                  <a href="{% url 'gestion:quote-update' q.pk %}" class="btn btn-sm btn-icon btn-outline-secondary" title="Modifier">
+                    <i class="ti ti-edit"></i>
+                  </a>
+                  {% endif %}
+                  {% if q.status == "pending" and perms.quotes.change_quoterequest %}
+                  <form method="post" action="{% url 'gestion:quote-process' q.pk %}" style="display: inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-icon btn-outline-warning" title="Traiter">
+                      <i class="ti ti-settings"></i>
+                    </button>
+                  </form>
+                  {% endif %}
+                  {% if perms.quotes.delete_quoterequest %}
+                  <a href="{% url 'gestion:quote-delete' q.pk %}" class="btn btn-sm btn-icon btn-outline-danger" title="Supprimer">
+                    <i class="ti ti-trash"></i>
+                  </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted">Aucune demande.</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-center text-muted">
+              Vous n'avez pas la permission de voir les demandes de devis.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+    {% if page_obj.paginator.count > 0 %}
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mt-3 pt-3 border-top">
+      <p class="text-muted small mb-0">
+        Affichage {{ page_obj.start_index }}–{{ page_obj.end_index }} sur {{ page_obj.paginator.count }} demande{{ page_obj.paginator.count|pluralize }}
+      </p>
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav aria-label="Pagination des demandes de devis">
+        <ul class="pagination pagination-sm mb-0">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Précédent">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+          {% endif %}
+          <li class="page-item disabled">
+            <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+          </li>
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Suivant">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
