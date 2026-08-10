@@ -1,14 +1,23 @@
-RewriteEngine On
-# Servir les fichiers statiques directement (éviter 502)
-RewriteCond %{REQUEST_URI} ^/static/(.*)$
-RewriteCond %{DOCUMENT_ROOT}/staticfiles/%1 -f
-RewriteRule ^static/(.*)$ staticfiles/$1 [L]
-
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
 PassengerAppRoot "/home/sc1fqrl4292/airplus-hvac"
 PassengerBaseURI "/"
 PassengerPython "/home/sc1fqrl4292/virtualenv/airplus-hvac/3.11/bin/python"
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# Compression gzip (HTML, CSS, JS, etc.) = site plus rapide
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json
+</IfModule>
+RewriteEngine On
+# Servir les fichiers statiques directement (éviter 502)
+RewriteCond %{REQUEST_URI} ^/static/(.*)$
+RewriteCond %{DOCUMENT_ROOT}/staticfiles/%1 -f
+RewriteRule ^static/(.*)$ staticfiles/$1 [L]
+# Cache navigateur pour les statiques (CSS, JS, images)
+<IfModule mod_headers.c>
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|ico|css|js|woff2?|ttf)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
 PassengerEnabled On
 PassengerAppEnv development
 PassengerFriendlyErrorPages on

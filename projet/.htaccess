@@ -1,0 +1,4 @@
+PassengerEnabled On
+PassengerAppEnv development
+PassengerFriendlyErrorPages on
+PassengerPython /home/sc1fqr14292/virtualenv/airplus-hvac.net/django/projet/3.11/bin/python3.11

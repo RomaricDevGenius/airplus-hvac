@@ -17,10 +17,13 @@ from dotenv import load_dotenv
 
 from .template import TEMPLATE_CONFIG, THEME_LAYOUT_DIR, THEME_VARIABLES
 
-load_dotenv()  # take environment variables from .env.
+# Toujours charger le .env à la racine du projet (même sous cPanel/Passenger)
+_project_root = Path(__file__).resolve().parent.parent
+_env_file = _project_root / ".env"
+load_dotenv(dotenv_path=_env_file)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = _project_root
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -117,33 +120,24 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# Database - SQLite en local si USE_SQLITE=True, sinon MySQL
+# Database - MySQL
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-USE_SQLITE = os.environ.get("USE_SQLITE", "").lower() in ("true", "1", "yes")
+# Créer la base si besoin : CREATE DATABASE mine CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-if USE_SQLITE:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.environ.get("DB_NAME", "mine"),
+        "USER": os.environ.get("DB_USER", "root"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
+        "PORT": os.environ.get("DB_PORT", "3306"),
+        "OPTIONS": {
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
-else:
-    # MySQL - créer la base si besoin : CREATE DATABASE mine CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    DATABASES = {
-        "default": {
-            "ENGINE": "config.db_backends.mysql",
-            "NAME": os.environ.get("DB_NAME", "mine"),
-            "USER": os.environ.get("DB_USER", "root"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-            "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
-            "PORT": os.environ.get("DB_PORT", "3306"),
-            "OPTIONS": {
-                "charset": "utf8mb4",
-                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            },
-        }
-    }
+}
 
 
 # Password validation
@@ -200,9 +194,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "src" / "assets",
 ]
-
-# URLs CDN pour logo et images du carrousel (contourner ERR_HTTP2 sur l’hébergement)
-# Si définies dans .env, ces assets sont chargés depuis l’URL indiquée au lieu de /static/
 
 # Default URL on which Django application runs for specific environment
 BASE_URL = os.environ.get("BASE_URL", default="http://127.0.0.1:8000")
