@@ -21,3 +21,12 @@ class SystemView(TemplateView):
         )
 
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        # `status` est fourni par les handlers d'erreur (voir config/urls.py).
+        # Sans ceci, TemplateView renverrait 200 : la page d'erreur s'afficherait
+        # correctement mais annoncerait « tout va bien » aux navigateurs, aux
+        # moteurs de recherche et aux outils de supervision.
+        if self.status:
+            response_kwargs.setdefault("status", int(self.status))
+        return super().render_to_response(context, **response_kwargs)
