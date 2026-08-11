@@ -62,11 +62,47 @@ class EmailAuthenticationForm(AuthenticationForm):
         return self.cleaned_data
 
 
-# Applications et permissions affichées dans les rôles (logique métier uniquement).
-# On exclut : auth (utilisateurs, groupes, permissions), contenttypes.
-APPS_BUSINESS = ("catalog", "clients", "quotes")
-# Permission custom accounts à inclure (ex. voir le tableau de bord)
-PERMISSION_CODENAMES_ACCOUNTS_ALLOWED = ("view_dashboard",)
+# Permissions proposées dans les rôles, regroupées par section.
+# Chaque permission est listée explicitement (app_label, codename) : rien n'entre
+# par accident, et l'ordre des tuples est l'ordre d'affichage du formulaire.
+# La section « Administration » permet de déléguer la gestion du personnel et des
+# rôles à un Administrateur, sans lui donner le statut technique de superuser.
+PERMISSION_SECTIONS = (
+    ("Catalogue (produits & stock)", (
+        ("catalog", "view_product"),
+        ("catalog", "add_product"),
+        ("catalog", "change_product"),
+        ("catalog", "delete_product"),
+        ("catalog", "view_stockmovement"),
+        ("catalog", "add_stockmovement"),
+        ("catalog", "change_stockmovement"),
+        ("catalog", "delete_stockmovement"),
+    )),
+    ("Clients", (
+        ("clients", "view_clientprofile"),
+        ("clients", "add_clientprofile"),
+        ("clients", "change_clientprofile"),
+        ("clients", "delete_clientprofile"),
+    )),
+    ("Demandes de devis", (
+        ("quotes", "view_quoterequest"),
+        ("quotes", "change_quoterequest"),
+        ("quotes", "delete_quoterequest"),
+    )),
+    ("Tableau de bord", (
+        ("accounts", "view_dashboard"),
+    )),
+    ("Administration", (
+        ("accounts", "view_user"),
+        ("accounts", "add_user"),
+        ("accounts", "change_user"),
+        ("accounts", "delete_user"),
+        ("auth", "view_group"),
+        ("auth", "add_group"),
+        ("auth", "change_group"),
+        ("auth", "delete_group"),
+    )),
+)
 
 # Libellés métier en français pour chaque permission (app_label, codename) -> label
 PERMISSION_LABELS = {
@@ -91,29 +127,33 @@ PERMISSION_LABELS = {
     ("quotes", "delete_quoterequest"): "Supprimer une demande de devis",
     # Tableau de bord
     ("accounts", "view_dashboard"): "Voir le tableau de bord",
+    # Administration — personnel
+    ("accounts", "view_user"): "Voir le personnel",
+    ("accounts", "add_user"): "Ajouter un membre du personnel",
+    ("accounts", "change_user"): "Modifier un membre du personnel",
+    ("accounts", "delete_user"): "Supprimer un membre du personnel",
+    # Administration — rôles
+    ("auth", "view_group"): "Voir les rôles",
+    ("auth", "add_group"): "Créer un rôle",
+    ("auth", "change_group"): "Modifier un rôle",
+    ("auth", "delete_group"): "Supprimer un rôle",
+}
+
+# (app_label, codename) -> libellé de la section qui contient la permission
+PERMISSION_SECTION_BY_KEY = {
+    key: label for label, keys in PERMISSION_SECTIONS for key in keys
 }
 
 
 def get_business_permissions_queryset():
-    """Permissions métier : Product, StockMovement, ClientProfile, QuoteRequest, view_dashboard. Exclut manage_stock (obsolète)."""
+    """Permissions sélectionnables dans un rôle : celles listées dans PERMISSION_SECTIONS."""
     from django.db.models import Q
-    qs = Permission.objects.filter(
-        content_type__app_label__in=APPS_BUSINESS,
-        content_type__model__in=("product", "stockmovement", "clientprofile", "quoterequest"),
-    ).exclude(
-        content_type__app_label="catalog",
-        content_type__model="product",
-        codename="manage_stock",
-    ).exclude(
-        content_type__app_label="quotes",
-        content_type__model="quoterequest",
-        codename="add_quoterequest",
-    ).select_related("content_type").order_by("content_type__app_label", "codename")
-    qs_dashboard = Permission.objects.filter(
-        content_type__app_label="accounts",
-        codename__in=PERMISSION_CODENAMES_ACCOUNTS_ALLOWED,
-    ).select_related("content_type")
-    return (qs | qs_dashboard).distinct().order_by("content_type__app_label", "codename")
+
+    query = Q()
+    for _, keys in PERMISSION_SECTIONS:
+        for app_label, codename in keys:
+            query |= Q(content_type__app_label=app_label, codename=codename)
+    return Permission.objects.filter(query).select_related("content_type")
 
 
 def get_permission_label(permission):
@@ -122,33 +162,24 @@ def get_permission_label(permission):
     return PERMISSION_LABELS.get(key, permission.name)
 
 
-# Libellés des sections pour le formulaire rôles (app_label -> nom affiché)
-PERMISSION_SECTION_LABELS = {
-    "catalog": "Catalogue (produits & stock)",
-    "clients": "Clients",
-    "quotes": "Demandes de devis",
-    "accounts": "Tableau de bord",
-}
+def get_permission_section(permission):
+    """Retourne le libellé de la section à laquelle appartient une permission."""
+    key = (permission.content_type.app_label, permission.codename)
+    return PERMISSION_SECTION_BY_KEY.get(key, permission.content_type.app_label)
 
 
 def get_permissions_grouped():
-    """Retourne les permissions métier regroupées par section pour l'affichage formulaire rôles."""
-    qs = get_business_permissions_queryset()
-    groups = []
-    current_app = None
-    current_list = []
-    for p in qs:
-        app = p.content_type.app_label
-        if app != current_app:
-            if current_list:
-                groups.append((PERMISSION_SECTION_LABELS.get(current_app, current_app), current_list))
-            current_app = app
-            current_list = [(p, get_permission_label(p))]
-        else:
-            current_list.append((p, get_permission_label(p)))
-    if current_list:
-        groups.append((PERMISSION_SECTION_LABELS.get(current_app, current_app), current_list))
-    return groups
+    """Permissions regroupées par section, dans l'ordre défini par PERMISSION_SECTIONS."""
+    by_key = {
+        (p.content_type.app_label, p.codename): p
+        for p in get_business_permissions_queryset()
+    }
+    grouped = []
+    for label, keys in PERMISSION_SECTIONS:
+        items = [(by_key[key], get_permission_label(by_key[key])) for key in keys if key in by_key]
+        if items:
+            grouped.append((label, items))
+    return grouped
 
 
 class EmailChangeForm(forms.Form):

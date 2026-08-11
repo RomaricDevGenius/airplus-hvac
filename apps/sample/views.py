@@ -35,7 +35,6 @@ from .mixins import (
     MENU_PERMISSION_GROUPS,
     AnyPermissionRequiredMixin,
     StaffRequiredMixin,
-    SuperuserRequiredMixin,
 )
 
 User = get_user_model()
@@ -381,22 +380,37 @@ class GestionPasswordChangeView(StaffRequiredMixin, GestionLayoutMixin, Password
         return super().form_valid(form)
 
 
-# ——— Utilisateurs (superuser) ———
+# ——— Utilisateurs (permissions « personnel ») ———
 
-class UserListView(SuperuserRequiredMixin, GestionLayoutMixin, ListView):
+def staff_queryset_visible_to(user):
+    """
+    Personnel visible par `user`.
+
+    Les comptes Super Administrateur sont réservés aux superusers : un Administrateur
+    ne peut ni les lister, ni les ouvrir par URL, ni les modifier ou les supprimer.
+    """
+    qs = User.objects.filter(is_staff=True)
+    if not user.is_superuser:
+        qs = qs.exclude(is_superuser=True)
+    return qs
+
+
+class UserListView(StaffRequiredMixin, PermissionRequiredMixin, GestionLayoutMixin, ListView):
     """Liste du personnel (utilisateurs back-office). Les clients sont gérés dans Catalogue > Clients."""
     model = User
+    permission_required = "accounts.view_user"
     template_name = "admin/gestion/user_list.html"
     context_object_name = "users"
     paginate_by = 20
 
     def get_queryset(self):
-        return User.objects.filter(is_staff=True).order_by("email").prefetch_related("groups")
+        return staff_queryset_visible_to(self.request.user).order_by("email").prefetch_related("groups")
 
 
-class UserCreateView(SuperuserRequiredMixin, GestionLayoutMixin, CreateView):
+class UserCreateView(StaffRequiredMixin, PermissionRequiredMixin, GestionLayoutMixin, CreateView):
     """Création d'un utilisateur (connexion par email)."""
     model = User
+    permission_required = "accounts.add_user"
     form_class = UserCreateForm
     template_name = "admin/gestion/user_form.html"
     success_url = reverse_lazy("gestion:user-list")
@@ -415,13 +429,17 @@ class UserCreateView(SuperuserRequiredMixin, GestionLayoutMixin, CreateView):
         return super().form_valid(form)
 
 
-class UserUpdateView(SuperuserRequiredMixin, GestionLayoutMixin, UpdateView):
+class UserUpdateView(StaffRequiredMixin, PermissionRequiredMixin, GestionLayoutMixin, UpdateView):
     """Édition d'un utilisateur."""
     model = User
+    permission_required = "accounts.change_user"
     form_class = UserUpdateForm
     template_name = "admin/gestion/user_form.html"
     context_object_name = "user_obj"
     success_url = reverse_lazy("gestion:user-list")
+
+    def get_queryset(self):
+        return staff_queryset_visible_to(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -437,23 +455,28 @@ class UserUpdateView(SuperuserRequiredMixin, GestionLayoutMixin, UpdateView):
         return super().form_valid(form)
 
 
-class UserDeleteView(SuperuserRequiredMixin, GestionLayoutMixin, DeleteView):
+class UserDeleteView(StaffRequiredMixin, PermissionRequiredMixin, GestionLayoutMixin, DeleteView):
     """Suppression d'un utilisateur."""
     model = User
+    permission_required = "accounts.delete_user"
     template_name = "admin/gestion/user_confirm_delete.html"
     context_object_name = "user_obj"
     success_url = reverse_lazy("gestion:user-list")
+
+    def get_queryset(self):
+        return staff_queryset_visible_to(self.request.user)
 
     def form_valid(self, form):
         messages.success(self.request, "Utilisateur supprimé.")
         return super().form_valid(form)
 
 
-# ——— Rôles (Group, superuser) ———
+# ——— Rôles (Group, permissions « rôles ») ———
 
-class RoleListView(SuperuserRequiredMixin, GestionLayoutMixin, ListView):
+class RoleListView(StaffRequiredMixin, PermissionRequiredMixin, GestionLayoutMixin, ListView):
     """Liste des rôles (groupes Django)."""
     model = Group
+    permission_required = "auth.view_group"
     template_name = "admin/gestion/role_list.html"
     context_object_name = "roles"
     paginate_by = 20
@@ -462,30 +485,31 @@ class RoleListView(SuperuserRequiredMixin, GestionLayoutMixin, ListView):
         return Group.objects.prefetch_related("permissions").order_by("name")
 
 
-class RoleDetailView(SuperuserRequiredMixin, GestionLayoutMixin, DetailView):
+class RoleDetailView(StaffRequiredMixin, PermissionRequiredMixin, GestionLayoutMixin, DetailView):
     """Détail d'un rôle : permissions attribuées et personnel avec ce rôle."""
     model = Group
+    permission_required = "auth.view_group"
     template_name = "admin/gestion/role_detail.html"
     context_object_name = "role"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        from .forms import get_permission_label, PERMISSION_SECTION_LABELS
+        from .forms import get_permission_label, get_permission_section
         role_perms = self.object.permissions.select_related("content_type").order_by(
             "content_type__app_label", "codename"
         )
         grouped = {}
         for p in role_perms:
-            section = PERMISSION_SECTION_LABELS.get(p.content_type.app_label, p.content_type.app_label)
-            grouped.setdefault(section, []).append(get_permission_label(p))
+            grouped.setdefault(get_permission_section(p), []).append(get_permission_label(p))
         context["permissions_grouped"] = list(grouped.items())
         context["users_with_role"] = self.object.user_set.filter(is_staff=True).order_by("email")
         return context
 
 
-class RoleCreateView(SuperuserRequiredMixin, GestionLayoutMixin, CreateView):
+class RoleCreateView(StaffRequiredMixin, PermissionRequiredMixin, GestionLayoutMixin, CreateView):
     """Création d'un rôle."""
     model = Group
+    permission_required = "auth.add_group"
     form_class = GroupForm
     template_name = "admin/gestion/role_form.html"
     success_url = reverse_lazy("gestion:role-list")
@@ -504,9 +528,10 @@ class RoleCreateView(SuperuserRequiredMixin, GestionLayoutMixin, CreateView):
         return super().form_valid(form)
 
 
-class RoleUpdateView(SuperuserRequiredMixin, GestionLayoutMixin, UpdateView):
+class RoleUpdateView(StaffRequiredMixin, PermissionRequiredMixin, GestionLayoutMixin, UpdateView):
     """Édition d'un rôle."""
     model = Group
+    permission_required = "auth.change_group"
     form_class = GroupForm
     template_name = "admin/gestion/role_form.html"
     context_object_name = "role"
@@ -526,9 +551,10 @@ class RoleUpdateView(SuperuserRequiredMixin, GestionLayoutMixin, UpdateView):
         return super().form_valid(form)
 
 
-class RoleDeleteView(SuperuserRequiredMixin, GestionLayoutMixin, DeleteView):
+class RoleDeleteView(StaffRequiredMixin, PermissionRequiredMixin, GestionLayoutMixin, DeleteView):
     """Suppression d'un rôle."""
     model = Group
+    permission_required = "auth.delete_group"
     template_name = "admin/gestion/role_confirm_delete.html"
     context_object_name = "role"
     success_url = reverse_lazy("gestion:role-list")

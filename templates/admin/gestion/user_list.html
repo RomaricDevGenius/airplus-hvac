@@ -26,7 +26,7 @@
             <td>{{ u.email|default:"–" }}</td>
             <td>{{ u.get_full_name|default:"–" }}</td>
             <td>
-              {% if u.is_superuser %}Administrateur{% else %}{% for g in u.groups.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}{% endif %}
+              {% if u.is_superuser %}Super Administrateur{% else %}{% for g in u.groups.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% empty %}–{% endfor %}{% endif %}
             </td>
             <td>
               {% if u.is_staff %}<i class="ti ti-check text-success"></i>{% else %}<i class="ti ti-x text-muted"></i>{% endif %}

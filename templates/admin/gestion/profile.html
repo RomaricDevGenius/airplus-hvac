@@ -25,10 +25,10 @@
 
             <dt class="col-sm-4 text-muted fw-normal mb-2">Rôle</dt>
             <dd class="col-sm-8 mb-2">
-              {% if admin_user.groups.all %}
+              {% if admin_user.is_superuser %}
+                Super Administrateur
+              {% elif admin_user.groups.all %}
                 {% for g in admin_user.groups.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-              {% elif admin_user.is_superuser %}
-                Administrateur
               {% else %}
                 Personnel
               {% endif %}

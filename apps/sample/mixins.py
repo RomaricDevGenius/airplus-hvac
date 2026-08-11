@@ -38,6 +38,8 @@ MENU_PERMISSION_GROUPS = {
         "quotes.delete_quoterequest",
     ],
     "historique": ["catalog.view_stockmovement"],
+    "user-list": ["accounts.view_user"],
+    "role-list": ["auth.view_group"],
 }
 
 MENU_HEADER_ITEMS = {
@@ -114,7 +116,11 @@ class GestionLayoutMixin:
                 header = item.get("menu_header")
                 if header:
                     if header == "Administration":
-                        if not user.is_superuser:
+                        admin_slugs = MENU_HEADER_ITEMS.get("Administration", [])
+                        if not any(
+                            _user_has_any_menu_permission(user, MENU_PERMISSION_GROUPS.get(s, []))
+                            for s in admin_slugs
+                        ):
                             continue
                     elif header == "Activité":
                         if not _user_has_any_menu_permission(user, MENU_PERMISSION_GROUPS.get("historique", [])):
@@ -127,10 +133,7 @@ class GestionLayoutMixin:
                         ):
                             continue
                 elif slug:
-                    if slug in ("user-list", "role-list"):
-                        if not user.is_superuser:
-                            continue
-                    elif slug in MENU_PERMISSION_GROUPS:
+                    if slug in MENU_PERMISSION_GROUPS:
                         if not _user_has_any_menu_permission(user, MENU_PERMISSION_GROUPS[slug]):
                             continue
                 new_menu.append(item)
