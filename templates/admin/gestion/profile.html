@@ -86,7 +86,11 @@
           {% endif %}
         </div>
         <div class="col-12 col-md-2 d-flex align-items-end">
-          <button type="submit" class="btn btn-primary w-100">Enregistrer</button>
+          {% comment %}
+            Spinner et blocage du double clic gérés par src/assets/js/airplus-forms.js
+            (automatique sur tout <form method="post">) : seul le texte d'attente est précisé.
+          {% endcomment %}
+          <button type="submit" class="btn btn-primary w-100" data-airplus-loading-text="Enregistrement…">Enregistrer</button>
         </div>
       </form>
     </div>

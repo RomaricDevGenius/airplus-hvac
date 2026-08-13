@@ -1,0 +1,30 @@
+{% comment %}
+  AIRPLUS HVAC — Rendu unifié des messages Django (back-office).
+
+  Inclus par layout_vertical.html et layout_horizontal.html afin que le balisage
+  soit strictement identique partout et que src/assets/js/airplus-feedback.js
+  puisse le capter de façon fiable.
+
+  Amélioration progressive : le serveur rend ici de vraies alertes Bootstrap.
+  - Sans JavaScript, l'utilisateur voit ces alertes classiques (rien n'est cassé).
+  - Avec JavaScript, airplus-feedback.js les convertit en toasts puis les retire.
+
+  Le conteneur est TOUJOURS rendu, même vide : sa présence sert de marqueur au JS
+  pour distinguer les layouts équipés du partial de ceux qui ne le sont pas.
+
+  Note : `message.tags` vaut « error » tant que MESSAGE_TAGS n'est pas configuré
+  dans settings.py ; on ajoute donc « alert-danger » pour que l'alerte reste
+  correctement stylée dans le cas sans JavaScript.
+{% endcomment %}
+<div class="airplus-messages{% if messages %} mb-4{% endif %}" data-airplus-messages>
+  {% for message in messages %}
+  <div
+    class="alert alert-{{ message.tags }}{% if message.level_tag == 'error' %} alert-danger{% endif %} alert-dismissible"
+    role="alert"
+    data-airplus-level="{{ message.level_tag }}"
+  >
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+  </div>
+  {% endfor %}
+</div>

@@ -32,7 +32,12 @@
           <input type="text" name="note" id="id_note" class="form-control" maxlength="255" placeholder="Ex. : Vente, Réception, Correction...">
         </div>
         <div class="col-12">
-          <button type="submit" class="btn btn-primary">Enregistrer le mouvement</button>
+          {% comment %}
+            Formulaire particulièrement sensible au double clic : deux envois créeraient
+            deux mouvements de stock. Le verrou est posé par src/assets/js/airplus-forms.js
+            (automatique sur tout <form method="post">) ; ici on ne précise que le texte d'attente.
+          {% endcomment %}
+          <button type="submit" class="btn btn-primary" data-airplus-loading-text="Enregistrement…">Enregistrer le mouvement</button>
           <a href="{% url 'gestion:product-list' %}" class="btn btn-outline-secondary">Annuler</a>
         </div>
       </div>

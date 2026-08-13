@@ -28,8 +28,10 @@
       .top-auth{display:flex;align-items:center;gap:10px;}
       .top-auth .auth-user-pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.4);padding:3px 9px;color:#fff;white-space:nowrap;}
       .top-auth .auth-user-pill i{font-size:.85rem;color:#bbf7d0;}
-      .top-auth a{color:#fff;text-decoration:none;font-weight:500;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.4);transition:all .2s;font-size:.8rem;}
-      .top-auth a:hover{background:rgba(255,255,255,.15);}
+      /* Le bouton de déconnexion (formulaire POST) partage le style des liens. */
+      .top-auth a,.top-auth .apf-logout-btn{color:#fff;text-decoration:none;font-weight:500;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.4);transition:all .2s;font-size:.8rem;}
+      .top-auth a:hover,.top-auth .apf-logout-btn:hover{background:rgba(255,255,255,.15);}
+      .top-auth .apf-logout-btn{font-family:inherit;line-height:inherit;background:none;cursor:pointer;}
       .main-navbar{position:sticky;top:0;z-index:999;background:#ffffff;box-shadow:0 2px 20px rgba(0,0,0,.1);padding:8px 0;transition:all .3s;}
       .main-navbar>.container{display:flex;align-items:center;justify-content:space-between;gap:18px;}
       .navbar-brand-custom{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0;}
@@ -128,7 +130,15 @@
                 <i class="fa-solid fa-user-check"></i>
                 Connecté
               </span>
-              <a href="{% url 'front:logout' %}"><i class="fa-solid fa-right-from-bracket" style="margin-right:9px;"></i>Déconnexion</a>
+              {% comment %}
+                Déconnexion en POST (protection CSRF) : un lien en GET pouvait être
+                déclenché par un préchargement du navigateur ou une balise <img>
+                hébergée sur un site tiers. Le bouton reprend le style de `.top-auth a`.
+              {% endcomment %}
+              <form method="post" action="{% url 'front:logout' %}" class="apf-logout-form">
+                {% csrf_token %}
+                <button type="submit" class="apf-logout-btn"><i class="fa-solid fa-right-from-bracket" style="margin-right:9px;"></i>Déconnexion</button>
+              </form>
             {% else %}
               <a href="{% url 'front:login' %}"><i class="fa-solid fa-user" style="margin-right:9px;"></i>Connexion</a>
               <a href="{% url 'front:register' %}"><i class="fa-solid fa-user-plus" style="margin-right:9px;"></i>Inscription</a>
@@ -220,7 +230,19 @@
                       </div>
                     </td>
                     <td style="text-align:center;">
-                      <form method="post" action="{% url 'front:cart_remove' %}" style="margin:0;">
+                      {% comment %}
+                        data-confirm : une confirmation est demandée avant le retrait
+                        complet de l'article (voir includes/site_feedback.html).
+                        Sans JavaScript, l'attribut est ignoré et le formulaire
+                        s'envoie normalement : le parcours reste fonctionnel.
+                      {% endcomment %}
+                      <form
+                        method="post"
+                        action="{% url 'front:cart_remove' %}"
+                        style="margin:0;"
+                        data-confirm="Retirer « {{ item.product.designation }} » de votre panier ?"
+                        data-confirm-ok="Retirer l'article"
+                      >
                         {% csrf_token %}
                         <input type="hidden" name="product_id" value="{{ item.product.pk }}" />
                         <input type="hidden" name="delta" value="-9999" />
@@ -302,6 +324,9 @@
         </div>
       </div>
     </div>
+
+    {% comment %}Messages Django (devis, retrait d'article…) + confirmation de retrait.{% endcomment %}
+    {% include "site web/includes/site_feedback.html" %}
 
     <script src="{% static 'site/js/jquery.min.js' %}"></script>
     <script src="{% static 'site/js/bootstrap.min.js' %}"></script>

@@ -1,5 +1,7 @@
 from django.urls import path
 
+from apps.audit import views as audit_views
+
 from . import views
 
 app_name = "gestion"
@@ -40,6 +42,9 @@ urlpatterns = [
     path("roles/<int:pk>/", views.RoleDetailView.as_view(), name="role-detail"),
     path("roles/<int:pk>/modifier/", views.RoleUpdateView.as_view(), name="role-update"),
     path("roles/<int:pk>/supprimer/", views.RoleDeleteView.as_view(), name="role-delete"),
+    # Journal d'audit (lecture seule : le journal est immuable)
+    path("audit/", audit_views.AuditLogListView.as_view(), name="audit-list"),
+    path("audit/<int:pk>/", audit_views.AuditLogDetailView.as_view(), name="audit-detail"),
     # Notifications
     path("notifications/<int:pk>/lire/", views.notification_mark_read, name="notif-read"),
     path("notifications/tout-lire/", views.notification_mark_all_read, name="notif-read-all"),

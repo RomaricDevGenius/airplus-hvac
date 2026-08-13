@@ -51,7 +51,15 @@
           </div>
         </div>
         <div class="col-12">
-          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          {% comment %}
+            src/assets/js/airplus-forms.js habille automatiquement ce bouton à la soumission
+            (spinner + verrou anti double-clic) : rien à déclarer, seul le texte d'attente est précisé.
+            Ce formulaire porte une image : quand un fichier est réellement joint, le texte
+            « Envoi de l'image… » est affiché à la place, car c'est là que l'attente est longue.
+          {% endcomment %}
+          <button type="submit" class="btn btn-primary"
+                  data-airplus-loading-text="Enregistrement…"
+                  data-airplus-loading-text-file="Envoi de l'image…">Enregistrer</button>
           <a href="{% url 'gestion:product-list' %}" class="btn btn-outline-secondary">Annuler</a>
         </div>
       </div>

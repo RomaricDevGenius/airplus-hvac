@@ -1,3 +1,9 @@
+{% load static %}
+
+{% comment %}
+  La surcouche CSS de cette sidebar (pied de menu + bouton de déconnexion) est
+  chargée dans partials/styles.html, avec les autres feuilles de style.
+{% endcomment %}
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme d-flex flex-column">
   {% if not navbar_full %}
   <div class="app-brand d-flex flex-column w-100 flex-shrink-0" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
@@ -11,7 +17,18 @@
 
   <div class="menu-inner-shadow flex-shrink-0"></div>
 
-  <div class="flex-grow-1 overflow-y-auto min-h-0">
+  {% comment %}
+    ATTENTION : ce <ul class="menu-inner"> doit rester un enfant DIRECT de
+    l'aside et être le SEUL élément portant la classe "menu-inner".
+    - Vuexy y branche perfect-scrollbar via el.querySelector('.menu-inner')
+      (src/assets/js/menu.js:34) : c'est lui, et lui seul, qui défile.
+    - L'entourer d'un conteneur intermédiaire casse la mise en page : avec
+      .menu-inner { height:100% } (src/assets/vendor/css/core.css:24408) le
+      menu occupe toute la hauteur de ce conteneur et pousse tout ce qui le
+      suit hors de l'aside, où .menu-vertical { overflow:hidden }
+      (core.css:24530) le masque définitivement. C'était la cause exacte de
+      l'invisibilité du bouton de déconnexion.
+  {% endcomment %}
   <ul class="menu-inner py-1">
     {% for item in menu_data.menu %}
     {% if "menu_header" in item %}
@@ -21,15 +38,40 @@
     {% endif %}
     {% endfor %}
   </ul>
-  <div class="menu-bottom pt-2 border-top">
-    <ul class="menu-inner py-1">
-      <li class="menu-item">
-        <a href="{% url 'gestion:logout' %}" class="menu-link">
-          <i class="menu-icon tf-icons ti ti-logout"></i>
-          <div>Déconnexion</div>
-        </a>
-      </li>
-    </ul>
-  </div>
+
+  {% comment %}
+    Pied de sidebar : frère direct du menu, en flex-shrink:0 → toujours
+    visible, même quand le menu est long. Voir src/assets/css/airplus-sidebar.css.
+
+    Déconnexion en POST + jeton CSRF : un simple lien GET permettrait à un
+    préchargement de navigateur, une extension ou une balise <img src="...">
+    hébergée sur un site tiers de déconnecter l'utilisateur à son insu. Même
+    raisonnement que LogoutView, POST-only depuis Django 5.
+
+    Repère stable pour la vague 2 (confirmation) : l'id du formulaire et la
+    classe commune aux deux formulaires de déconnexion du back-office.
+  {% endcomment %}
+  <div class="menu-bottom flex-shrink-0">
+    <form id="airplus-logout-form-sidebar"
+          class="menu-logout-form airplus-logout-form js-logout-form"
+          method="post"
+          action="{% url 'gestion:logout' %}">
+      {% csrf_token %}
+      {% comment %}
+        Confirmation de déconnexion : le bouton est déjà dans son <form method="post">,
+        la règle 2 du socle soumet ce formulaire une fois la confirmation obtenue.
+        Style « question » : ce n'est ni une destruction ni un changement d'état des données.
+        La structure, les classes et l'id du formulaire ne doivent pas bouger.
+      {% endcomment %}
+      <button type="submit" class="menu-link menu-logout-link"
+              data-airplus-confirm="Se déconnecter ?"
+              data-airplus-confirm-text="Vous allez quitter le back-office. Toute saisie en cours qui n'a pas été enregistrée sera perdue."
+              data-airplus-confirm-button="Oui, me déconnecter"
+              data-airplus-confirm-cancel="Rester connecté"
+              data-airplus-confirm-style="question">
+        <i class="menu-icon tf-icons ti ti-logout"></i>
+        <div>Déconnexion</div>
+      </button>
+    </form>
   </div>
 </aside>

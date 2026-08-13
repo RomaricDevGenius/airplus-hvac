@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+from django.contrib.messages import constants as messages_constants
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
@@ -62,6 +63,8 @@ INSTALLED_APPS = [
     "apps.catalog",
     "apps.clients",
     "apps.quotes",
+    # Traçabilité back-office
+    "apps.audit",
     # Site & démo
     "apps.front",
     "apps.sample",
@@ -84,9 +87,23 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Contexte d'audit : doit être APRÈS AuthenticationMiddleware (il lit request.user)
+    # et le plus tôt possible ensuite, pour couvrir les middlewares/vues suivants.
+    "apps.audit.middleware.AuditContextMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Aligne les niveaux de message Django sur les classes Bootstrap 5.
+# Sans cela, messages.error produit "alert-error", classe qui n'existe pas en
+# Bootstrap 5 : les messages d'erreur s'affichaient sans style rouge.
+MESSAGE_TAGS = {
+    messages_constants.DEBUG: "secondary",
+    messages_constants.INFO: "info",
+    messages_constants.SUCCESS: "success",
+    messages_constants.WARNING: "warning",
+    messages_constants.ERROR: "danger",
+}
 
 ROOT_URLCONF = "config.urls"
 

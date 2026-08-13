@@ -3,6 +3,17 @@
 
 {% block layout %}
 
+{% comment %}
+  Messages Django : ce layout n'inclut VOLONTAIREMENT PAS
+  partials/messages.html. Les pages qui l'utilisent (connexion, inscription)
+  affichent déjà les messages elles-mêmes ; ajouter le partial ici créerait un
+  doublon d'alertes lorsque le JavaScript est désactivé.
+
+  Le socle reste opérationnel : src/assets/js/airplus-feedback.js détecte
+  l'absence du conteneur [data-airplus-messages] et convertit alors en toasts
+  les alertes Django rendues localement (.alert-dismissible[role="alert"]).
+{% endcomment %}
+
 <!-- Content: Start -->
 {% block content %}
 {% endblock content %}

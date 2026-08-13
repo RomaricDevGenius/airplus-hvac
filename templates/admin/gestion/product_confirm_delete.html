@@ -11,7 +11,12 @@
     <p class="text-danger">Cette action est irréversible.</p>
     <form method="post">
       {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Supprimer</button>
+      {% comment %}
+        Cette page reste le repli sans JavaScript (décision client) : aucune confirmation
+        supplémentaire ici, la page EST la confirmation. src/assets/js/airplus-forms.js y
+        ajoute simplement le spinner et le verrou anti double-clic quand le JS est disponible.
+      {% endcomment %}
+      <button type="submit" class="btn btn-danger" data-airplus-loading-text="Suppression…">Supprimer</button>
       <a href="{% url 'gestion:product-list' %}" class="btn btn-outline-secondary">Annuler</a>
     </form>
   </div>

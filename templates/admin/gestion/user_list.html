@@ -42,10 +42,20 @@
                   title="Modifier"
                   ><i class="ti ti-edit"></i
                 ></a>
+                {% comment %}
+                  Suppression : le href reste la page de confirmation dédiée (repli sans JavaScript).
+                  Avec JavaScript, data-airplus-post poste sur la MÊME URL et la DeleteView supprime.
+                {% endcomment %}
                 <a
                   href="{% url 'gestion:user-delete' u.pk %}"
                   class="btn btn-sm btn-icon btn-outline-danger"
                   title="Supprimer"
+                  data-airplus-confirm="Supprimer {{ u.get_full_name|default:u.email|default:u.username }} du personnel ?"
+                  data-airplus-confirm-text="Cette personne perdra immédiatement son accès au back-office et son compte sera effacé. Cette action est définitive."
+                  data-airplus-confirm-button="Oui, supprimer"
+                  data-airplus-confirm-cancel="Annuler"
+                  data-airplus-confirm-style="danger"
+                  data-airplus-post="{% url 'gestion:user-delete' u.pk %}"
                   ><i class="ti ti-trash"></i
                 ></a>
               </div>

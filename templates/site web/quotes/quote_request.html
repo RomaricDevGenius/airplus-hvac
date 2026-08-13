@@ -128,6 +128,27 @@
       .back-link:hover {
         color: #1060A0;
       }
+      /* Bouton de déconnexion (formulaire POST) habillé comme le lien voisin.
+         Cette page affiche déjà les messages Django en pleine largeur : elle
+         n'inclut donc pas includes/site_feedback.html, d'où ces règles locales. */
+      .apf-logout-form {
+        display: inline;
+        margin: 0;
+        padding: 0;
+      }
+      .apf-logout-btn {
+        background: none;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        font: inherit;
+        font-size: 12px;
+        color: #fff;
+        cursor: pointer;
+      }
+      .apf-logout-btn:hover {
+        color: #1060A0;
+      }
     </style>
   </head>
   <body>
@@ -142,7 +163,13 @@
         <ul class="header-links pull-right">
           <li><a href="{% url 'front:index' %}">Accueil</a></li>
           <li><a href="{% url 'front:store' %}">Boutique</a></li>
-          <li><a href="{% url 'front:logout' %}">Déconnexion</a></li>
+          <li>
+            {% comment %}Déconnexion en POST : un lien en GET pouvait être déclenché à l'insu du visiteur.{% endcomment %}
+            <form method="post" action="{% url 'front:logout' %}" class="apf-logout-form">
+              {% csrf_token %}
+              <button type="submit" class="apf-logout-btn">Déconnexion</button>
+            </form>
+          </li>
         </ul>
       </div>
     </div>

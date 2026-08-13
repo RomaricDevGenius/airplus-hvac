@@ -10,6 +10,16 @@
     <link rel="stylesheet" href="{% static 'site/css/bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'site/css/font-awesome.min.css' %}" />
     <link rel="stylesheet" href="{% static 'site/css/style.css' %}" />
+    <style>
+      /* Bouton de déconnexion (formulaire POST) habillé comme le lien voisin. */
+      .header-links li .apf-logout-btn {
+        color: #fff;
+        font-size: 12px;
+      }
+      .header-links li .apf-logout-btn:hover {
+        color: #1060a0;
+      }
+    </style>
   </head>
   <body>
     <div id="top-header" style="background: #1e1f29; padding: 10px 0">
@@ -23,7 +33,13 @@
         <ul class="header-links pull-right">
           <li><a href="{% url 'front:index' %}">Accueil</a></li>
           <li><a href="{% url 'front:store' %}">Boutique</a></li>
-          <li><a href="{% url 'front:logout' %}">Déconnexion</a></li>
+          <li>
+            {% comment %}Déconnexion en POST : un lien en GET pouvait être déclenché à l'insu du visiteur.{% endcomment %}
+            <form method="post" action="{% url 'front:logout' %}" class="apf-logout-form">
+              {% csrf_token %}
+              <button type="submit" class="apf-logout-btn">Déconnexion</button>
+            </form>
+          </li>
         </ul>
       </div>
     </div>
@@ -80,6 +96,12 @@
         </div>
       </div>
     </div>
+
+    {% comment %}
+      Messages Django : c'est ici qu'atterrit la confirmation « votre demande de
+      devis a bien été envoyée » émise par cart_quote_view avant sa redirection.
+    {% endcomment %}
+    {% include "site web/includes/site_feedback.html" %}
 
     <footer id="footer" class="section" style="background: #1e1f29; color: #b9babc; padding: 20px 0">
       <div class="container text-center">

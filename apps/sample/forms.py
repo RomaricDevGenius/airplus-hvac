@@ -101,6 +101,7 @@ PERMISSION_SECTIONS = (
         ("auth", "add_group"),
         ("auth", "change_group"),
         ("auth", "delete_group"),
+        ("audit", "view_auditlog"),
     )),
 )
 
@@ -137,6 +138,8 @@ PERMISSION_LABELS = {
     ("auth", "add_group"): "Créer un rôle",
     ("auth", "change_group"): "Modifier un rôle",
     ("auth", "delete_group"): "Supprimer un rôle",
+    # Administration — journal d'audit (lecture seule)
+    ("audit", "view_auditlog"): "Consulter le journal d'audit",
 }
 
 # (app_label, codename) -> libellé de la section qui contient la permission

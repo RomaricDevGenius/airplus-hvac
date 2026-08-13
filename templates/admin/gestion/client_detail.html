@@ -10,8 +10,19 @@
     {% if perms.clients.change_clientprofile %}
     <a href="{% url 'gestion:client-update' client.pk %}" class="btn btn-primary">Modifier</a>
     {% endif %}
+    {% comment %}
+      Suppression : le href reste la page de confirmation dédiée (repli sans JavaScript).
+      Avec JavaScript, data-airplus-post poste sur la MÊME URL et la DeleteView supprime.
+      La vue supprime la fiche client PUIS le compte utilisateur associé.
+    {% endcomment %}
     {% if perms.clients.delete_clientprofile %}
-    <a href="{% url 'gestion:client-delete' client.pk %}" class="btn btn-outline-danger">Supprimer</a>
+    <a href="{% url 'gestion:client-delete' client.pk %}" class="btn btn-outline-danger"
+       data-airplus-confirm="Supprimer le client {{ client.user.get_full_name|default:client.user.username }} ?"
+       data-airplus-confirm-text="La fiche client et son compte de connexion au site seront supprimés. Le client ne pourra plus se connecter. Cette action est définitive."
+       data-airplus-confirm-button="Oui, supprimer"
+       data-airplus-confirm-cancel="Annuler"
+       data-airplus-confirm-style="danger"
+       data-airplus-post="{% url 'gestion:client-delete' client.pk %}">Supprimer</a>
     {% endif %}
     <a href="{% url 'gestion:client-list' %}" class="btn btn-outline-secondary">Retour à la liste</a>
   </div>

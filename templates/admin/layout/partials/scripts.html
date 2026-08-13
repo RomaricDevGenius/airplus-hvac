@@ -1,5 +1,12 @@
 {% load static %}
 
+{% comment %}
+  Jeton CSRF global : lu par src/assets/js/airplus-feedback.js pour construire à la
+  volée les formulaires POST du contrat data-airplus-post. Présent sur toutes les
+  pages du back-office (layouts vertical, horizontal et blank).
+{% endcomment %}
+<span id="airplus-csrf" hidden>{% csrf_token %}</span>
+
 <!--Core Javascript-->
 <script src="{% static 'vendor/libs/jquery/jquery.js' %}"></script>
 <script src="{% static 'vendor/libs/popper/popper.js' %}"></script>
@@ -9,4 +16,8 @@
 <script src="{% static 'vendor/libs/hammer/hammer.js' %}"></script>
 <script src="{% static 'vendor/libs/typeahead-js/typeahead.js' %}"></script>
 <script src="{% static 'vendor/js/menu.js' %}"></script>
+<!-- Socle de notifications AIRPLUS : SweetAlert2 puis le module maison -->
+<script src="{% static 'vendor/libs/sweetalert2/sweetalert2.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/airplus-feedback.js' %}"></script>
+<script src="{% static 'js/airplus-forms.js' %}"></script>

@@ -8,10 +8,21 @@
     <small class="text-muted">#{{ quote.pk }} &bull; Reçue le {{ quote.created_at|date:"d/m/Y à H:i" }}</small>
   </div>
   <div class="d-flex gap-2">
+    {% comment %}
+      « Traiter la demande » change le statut sans retour possible en un clic : on demande
+      désormais confirmation. Ce n'est pas une destruction, d'où le style « warning ».
+      Le bouton est déjà dans son <form method="post"> : la règle 2 du socle soumet ce
+      formulaire après confirmation, aucun data-airplus-post n'est nécessaire.
+    {% endcomment %}
     {% if quote.status == "pending" %}
     <form method="post" action="{% url 'gestion:quote-process' quote.pk %}">
       {% csrf_token %}
-      <button type="submit" class="btn btn-warning"><i class="ti ti-settings me-1"></i>Traiter la demande</button>
+      <button type="submit" class="btn btn-warning"
+              data-airplus-confirm="Marquer cette demande comme traitée ?"
+              data-airplus-confirm-text="La demande « {{ quote.subject|truncatechars:60 }} » passera au statut « Traité ». Vous pourrez toujours changer ce statut ensuite via le bouton Modifier."
+              data-airplus-confirm-button="Oui, marquer traitée"
+              data-airplus-confirm-cancel="Annuler"
+              data-airplus-confirm-style="warning"><i class="ti ti-settings me-1"></i>Traiter la demande</button>
     </form>
     {% else %}
     <span class="badge bg-success fs-6 py-2 px-3"><i class="ti ti-check me-1"></i>{{ quote.get_status_display }}</span>

@@ -255,8 +255,12 @@
         <hr class="auth-divider" />
 
         {% if messages %} {% for message in messages %}
-        <div class="auth-alert {% if message.tags == 'error' %}error{% else %}success{% endif %}">
-          <i class="fa-solid {% if message.tags == 'error' %}fa-circle-xmark{% else %}fa-circle-check{% endif %}"></i>
+        {% comment %}
+          MESSAGE_TAGS mappe désormais ERROR sur « danger » (classe Bootstrap 5).
+          On teste les deux, sinon une erreur s'afficherait en vert avec une coche.
+        {% endcomment %}
+        <div class="auth-alert {% if 'danger' in message.tags or 'error' in message.tags %}error{% else %}success{% endif %}">
+          <i class="fa-solid {% if 'danger' in message.tags or 'error' in message.tags %}fa-circle-xmark{% else %}fa-circle-check{% endif %}"></i>
           {{ message }}
         </div>
         {% endfor %} {% endif %}

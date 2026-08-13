@@ -1,0 +1,154 @@
+{% extends layout_path %}
+{% load i18n %}
+
+{% block title %}Détail d'une entrée d'audit – Back-office{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">
+      <span class="badge {{ entree.pastille }} align-middle me-2"><i class="{{ entree.icone }} me-1"></i>{{ entree.get_action_display }}</span>
+    </h4>
+    <small class="text-muted">{{ entree.created_at|date:"l j F Y à H:i" }}</small>
+  </div>
+  <a href="{{ retour_liste }}" class="btn btn-outline-secondary">
+    <i class="ti ti-arrow-left me-1"></i>Retour au journal
+  </a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+
+    {% comment %}
+      Ce que le gérant vient chercher : la liste avant/après, en clair.
+      Les noms de champs sont ceux des modèles traduits en français par la vue,
+      et les valeurs à choix sont déjà remplacées par leur libellé.
+    {% endcomment %}
+    {% if entree.modifications %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0"><i class="ti ti-edit me-1"></i>Ce qui a changé</h6>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm mb-0 align-middle">
+            <thead>
+              <tr>
+                <th>Information</th>
+                <th>Avant</th>
+                <th></th>
+                <th>Après</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ligne in entree.modifications %}
+              <tr>
+                <td class="fw-semibold">{{ ligne.champ }}</td>
+                <td class="text-muted">{{ ligne.avant }}</td>
+                <td class="text-center text-muted"><i class="ti ti-arrow-right"></i></td>
+                <td class="fw-semibold">{{ ligne.apres }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% comment %}
+      Contexte complémentaire (`extra`) : indispensable, car certaines entrées
+      n'ont aucune modification et portent tout leur sens ici — changement de
+      mot de passe, identifiant saisi lors d'un échec, photo d'un objet supprimé.
+    {% endcomment %}
+    {% for bloc in entree.contexte %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0"><i class="ti ti-info-circle me-1"></i>{{ bloc.titre }}</h6>
+      </div>
+      <div class="card-body">
+        {% if bloc.lignes %}
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <tbody>
+              {% for ligne in bloc.lignes %}
+              <tr>
+                <td class="fw-semibold" style="width: 40%;">{{ ligne.champ }}</td>
+                <td>{{ ligne.valeur }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="mb-0">{{ bloc.valeur }}</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    {% if sans_detail %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <p class="mb-0 text-muted">
+          <i class="ti ti-info-circle me-1"></i>
+          Aucune donnée n'a été modifiée : c'est l'action elle-même
+          (« {{ entree.get_action_display }} ») qui constitue l'information enregistrée.
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h6 class="mb-0"><i class="ti ti-user me-1"></i>Auteur et objet</h6>
+      </div>
+      <div class="card-body">
+        <dl class="mb-0">
+          <dt class="small text-muted">Auteur</dt>
+          <dd>
+            {{ entree.actor_label|default:"Système" }}
+            {% if entree.compte_supprime %}
+            <br /><span class="badge bg-label-secondary mt-1">Ce compte a été supprimé depuis</span>
+            {% endif %}
+          </dd>
+
+          <dt class="small text-muted mt-3">Date et heure</dt>
+          <dd class="mb-0">{{ entree.created_at|date:"d/m/Y H:i:s" }}</dd>
+
+          {% if entree.object_repr or entree.content_type %}
+          <dt class="small text-muted mt-3">Objet concerné</dt>
+          <dd class="mb-0">
+            {% if entree.object_repr %}{{ entree.object_repr }}{% endif %}
+            {% if entree.content_type %}
+            <br /><small class="text-muted">{{ entree.content_type.name|capfirst }}</small>
+            {% endif %}
+          </dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+
+    {% comment %}
+      Traçabilité technique : utile en cas d'incident, mais reléguée en bas de
+      colonne et en petits caractères — ce n'est pas ce qu'on lit au quotidien.
+    {% endcomment %}
+    {% if entree.ip_address or entree.user_agent %}
+    <div class="card">
+      <div class="card-body">
+        <p class="small text-muted mb-1"><i class="ti ti-device-desktop me-1"></i>Origine de la connexion</p>
+        {% if entree.ip_address %}
+        <p class="small text-muted mb-1">Adresse : {{ entree.ip_address }}</p>
+        {% endif %}
+        {% if entree.user_agent %}
+        <p class="small text-muted mb-0" style="word-break: break-word;">Navigateur : {{ entree.user_agent }}</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

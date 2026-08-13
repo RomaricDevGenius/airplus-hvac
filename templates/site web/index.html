@@ -34,8 +34,10 @@
     .top-auth{display:flex;align-items:center;gap:10px;}
     .top-auth .auth-user-pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.4);padding:3px 9px;color:#fff;white-space:nowrap;}
     .top-auth .auth-user-pill i{font-size:.85rem;color:#bbf7d0;}
-    .top-auth a{color:#fff;text-decoration:none;font-weight:500;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.4);transition:all .2s;font-size:.8rem;}
-    .top-auth a:hover{background:rgba(255,255,255,.15);}
+    /* Le bouton de déconnexion (formulaire POST) partage le style des liens. */
+    .top-auth a,.top-auth .apf-logout-btn{color:#fff;text-decoration:none;font-weight:500;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,255,255,.4);transition:all .2s;font-size:.8rem;}
+    .top-auth a:hover,.top-auth .apf-logout-btn:hover{background:rgba(255,255,255,.15);}
+    .top-auth .apf-logout-btn{font-family:inherit;line-height:inherit;background:none;cursor:pointer;}
 
     /* NAVBAR */
     .main-navbar{position:sticky;top:0;z-index:999;background:var(--white);box-shadow:0 2px 20px rgba(0,0,0,.1);padding:8px 0;transition:all .3s;}
@@ -241,17 +243,8 @@
     .scroll-top-btn.visible{opacity:1;transform:translateY(0);}
     .scroll-top-btn:hover{transform:translateY(-4px);color:#fff;}
 
-    /* TOAST */
-    .toast-notice{position:fixed;bottom:40px;right:24px;min-width:260px;max-width:340px;background:var(--white);border-radius:0;box-shadow:0 2px 10px rgba(0,0,0,.12);padding:12px 14px;display:flex;align-items:flex-start;gap:10px;z-index:9999;transform:translateX(120%);transition:transform .3s ease-out;border:1px solid var(--border);}
-    .toast-notice.show{transform:translateX(0);}
-    .toast-notice .t-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;background:none;border-radius:0;}
-    .toast-notice.success .t-icon{color:#2e7d32;}
-    .toast-notice.error .t-icon{color:#c62828;}
-    .toast-notice .t-body{flex:1;padding-right:18px;}
-    .toast-notice .t-title{font-weight:600;color:var(--text);font-size:.85rem;margin-bottom:2px;}
-    .toast-notice .t-msg{color:var(--text-light);font-size:.8rem;line-height:1.4;}
-    .toast-notice .t-close{background:none;border:none;color:var(--text-light);cursor:pointer;padding:0;font-size:1rem;transition:color .2s;position:absolute;top:8px;right:10px;}
-    .toast-notice .t-close:hover{color:var(--text);}
+    /* TOAST : le style et le balisage ont été factorisés dans
+       includes/site_feedback.html, partagé par toutes les pages publiques. */
   </style>
 </head>
 <body>
@@ -280,7 +273,15 @@
             <i class="fa-solid fa-user-check"></i>
             Connecté
           </span>
-          <a href="{% url 'front:logout' %}"><i class="fa-solid fa-right-from-bracket" style="margin-right:9px;"></i>Déconnexion</a>
+          {% comment %}
+            Déconnexion en POST (protection CSRF) : un lien en GET pouvait être
+            déclenché par un préchargement du navigateur ou une balise <img>
+            hébergée sur un site tiers. Le bouton reprend le style de `.top-auth a`.
+          {% endcomment %}
+          <form method="post" action="{% url 'front:logout' %}" class="apf-logout-form">
+            {% csrf_token %}
+            <button type="submit" class="apf-logout-btn"><i class="fa-solid fa-right-from-bracket" style="margin-right:9px;"></i>Déconnexion</button>
+          </form>
         {% else %}
           <a href="{% url 'front:login' %}"><i class="fa-solid fa-user" style="margin-right:9px;"></i>Connexion</a>
           <a href="{% url 'front:register' %}"><i class="fa-solid fa-user-plus" style="margin-right:9px;"></i>Inscription</a>
@@ -665,15 +666,12 @@
 <!-- Scroll top -->
 <a href="#accueil" class="scroll-top-btn" id="scrollTopBtn" title="Retour en haut"><i class="fa-solid fa-arrow-up"></i></a>
 
-<!-- Toast -->
-<div class="toast-notice" id="toastNotice">
-  <div class="t-icon"><i id="toastIconI" class="fa-solid fa-circle-check"></i></div>
-  <div class="t-body">
-    <div class="t-title" id="toastTitle">Message envoyé !</div>
-    <div class="t-msg" id="toastMsg">Nous vous répondrons sous 24h.</div>
-  </div>
-  <button class="t-close" onclick="closeToast()"><i class="fa-solid fa-xmark"></i></button>
-</div>
+{% comment %}
+  Messages Django + notifications (fonction showToast). Cet include remplace le
+  toast qui n'existait qu'ici : il est désormais partagé par tout le site.
+  Il doit rester AVANT les scripts de la page, qui appellent showToast().
+{% endcomment %}
+{% include "site web/includes/site_feedback.html" %}
 
 <!-- SCRIPTS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -760,18 +758,8 @@
     finally{btn.classList.remove('loading');btn.disabled=false;}
   });
 
-  let toastTimeout;
-  function showToast(type,title,msg){
-    const t=document.getElementById('toastNotice');
-    t.className='toast-notice '+type;
-    document.getElementById('toastTitle').textContent=title;
-    document.getElementById('toastMsg').textContent=msg;
-      document.getElementById('toastIconI').className=type==='success'?'fa-solid fa-circle-check':'fa-solid fa-triangle-exclamation';
-    t.classList.add('show');
-    clearTimeout(toastTimeout);
-    toastTimeout=setTimeout(closeToast,5500);
-  }
-  function closeToast(){document.getElementById('toastNotice').classList.remove('show');}
+  /* showToast() et closeToast() sont désormais fournis par
+     includes/site_feedback.html (inclus plus haut) : plus de duplication. */
 
   const navLinks=document.querySelectorAll('.nav-link-custom');
   window.addEventListener('scroll',()=>{

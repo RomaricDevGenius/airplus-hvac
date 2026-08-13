@@ -43,16 +43,37 @@
                     <i class="ti ti-edit"></i>
                   </a>
                   {% endif %}
+                  {% comment %}
+                    « Traiter » n'est pas une destruction : style « warning ». Le bouton est déjà
+                    dans son <form method="post"> : la règle 2 du socle soumet ce formulaire après
+                    confirmation, aucun data-airplus-post n'est nécessaire ici.
+                  {% endcomment %}
                   {% if q.status == "pending" and perms.quotes.change_quoterequest %}
                   <form method="post" action="{% url 'gestion:quote-process' q.pk %}" style="display: inline">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-icon btn-outline-warning" title="Traiter">
+                    <button type="submit" class="btn btn-sm btn-icon btn-outline-warning" title="Traiter"
+                            data-airplus-confirm="Marquer cette demande comme traitée ?"
+                            data-airplus-confirm-text="La demande « {{ q.subject|truncatechars:60 }} » passera au statut « Traité ». Le statut restera modifiable ensuite depuis la fiche."
+                            data-airplus-confirm-button="Oui, marquer traitée"
+                            data-airplus-confirm-cancel="Annuler"
+                            data-airplus-confirm-style="warning">
                       <i class="ti ti-settings"></i>
                     </button>
                   </form>
                   {% endif %}
+                  {% comment %}
+                    Suppression : le href reste la page de confirmation dédiée (repli sans JavaScript).
+                    data-airplus-post est posé explicitement : ce lien est voisin du formulaire
+                    « Traiter » ci-dessus, on ne veut prendre aucun risque de soumission croisée.
+                  {% endcomment %}
                   {% if perms.quotes.delete_quoterequest %}
-                  <a href="{% url 'gestion:quote-delete' q.pk %}" class="btn btn-sm btn-icon btn-outline-danger" title="Supprimer">
+                  <a href="{% url 'gestion:quote-delete' q.pk %}" class="btn btn-sm btn-icon btn-outline-danger" title="Supprimer"
+                     data-airplus-confirm="Supprimer cette demande de devis ?"
+                     data-airplus-confirm-text="La demande « {{ q.subject|truncatechars:60 }} » et les produits qui y sont rattachés seront définitivement effacés. Le client n'en sera pas informé."
+                     data-airplus-confirm-button="Oui, supprimer"
+                     data-airplus-confirm-cancel="Annuler"
+                     data-airplus-confirm-style="danger"
+                     data-airplus-post="{% url 'gestion:quote-delete' q.pk %}">
                     <i class="ti ti-trash"></i>
                   </a>
                   {% endif %}

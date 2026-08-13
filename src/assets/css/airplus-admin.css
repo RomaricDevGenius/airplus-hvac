@@ -1,1 +1,80 @@
-/* AIRPLUS HVAC � admin overrides moved to master.html */
+@charset "UTF-8";
+/* AIRPLUS HVAC - admin overrides moved to master.html */
+
+/* ==========================================================================
+   AIRPLUS HVAC — Socle de notifications (SweetAlert2)
+   --------------------------------------------------------------------------
+   Surcharges maison du rendu SweetAlert2 : position et lisibilite des toasts,
+   empilement au-dessus de la navbar / du menu Vuexy, adaptation mobile.
+   Ce fichier est charge APRES vendor/libs/sweetalert2/sweetalert2.css
+   (voir templates/admin/layout/partials/styles.html).
+   ========================================================================== */
+
+/* Au-dessus de tout l'habillage Vuexy : navbar (1080), menu (1090),
+   modales Bootstrap (1055) et leur backdrop. */
+.swal2-container {
+  z-index: 10600 !important;
+}
+
+/* --- Toasts (haut a droite) --------------------------------------------- */
+.swal2-container.swal2-top-end {
+  padding: 1rem 1rem 0 0;
+}
+
+.swal2-popup.swal2-toast.airplus-toast {
+  box-shadow: 0 4px 16px rgba(16, 96, 160, 0.18);
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+}
+
+.swal2-popup.swal2-toast.airplus-toast .swal2-title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.swal2-popup.swal2-toast.airplus-toast .swal2-html-container {
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+/* Barre de progression aux couleurs du projet */
+.swal2-popup.swal2-toast.airplus-toast .swal2-timer-progress-bar {
+  background: rgba(16, 96, 160, 0.35);
+}
+
+/* --- Boites de confirmation / chargement -------------------------------- */
+/* buttonsStyling: false => les boutons sont de vrais boutons Bootstrap ;
+   on se contente d'aerer la zone d'actions. */
+.swal2-popup .swal2-actions {
+  gap: 0;
+  margin-top: 1.25rem;
+}
+
+.swal2-popup.airplus-loading .swal2-title {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* --- Adaptation mobile --------------------------------------------------- */
+@media (max-width: 575.98px) {
+  .swal2-container.swal2-top-end {
+    padding: 0.75rem 0.75rem 0;
+  }
+
+  .swal2-popup.swal2-toast.airplus-toast {
+    width: calc(100vw - 1.5rem);
+    max-width: calc(100vw - 1.5rem);
+  }
+
+  .swal2-popup .swal2-actions {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .swal2-popup .swal2-actions .btn {
+    width: 100%;
+    margin: 0.25rem 0 !important;
+  }
+}

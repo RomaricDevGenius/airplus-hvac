@@ -1,0 +1,170 @@
+/* ==========================================================================
+   AIRPLUS HVAC — Barre latérale du back-office (surcouche du thème Vuexy)
+   --------------------------------------------------------------------------
+   Objectif : garder le bloc « Déconnexion » épinglé en bas de la sidebar,
+   toujours visible, quelle que soit la longueur du menu ou la taille d'écran.
+
+   Rappel du diagnostic (cause de l'invisibilité du bouton avant correctif) :
+   - vendor/css/core.css:24402  → .menu-inner { height: 100%; }
+   - vendor/css/core.css:24530  → .menu-vertical { overflow: hidden; }
+   - les classes utilitaires « overflow-y-auto » et « min-h-0 » utilisées dans
+     l'ancien gabarit N'EXISTENT PAS dans core.css (Bootstrap 5.3 ne les
+     fournit pas). Le conteneur intermédiaire n'avait donc ni défilement ni
+     min-height:0 : le <ul class="menu-inner"> occupait 100 % de sa hauteur et
+     poussait le bloc bas en dehors de l'aside, où overflow:hidden le coupait.
+   - la classe « menu-bottom » n'était définie dans AUCUNE feuille de style.
+
+   Correctif : le <ul class="menu-inner"> et le <div class="menu-bottom"> sont
+   redevenus des enfants flex directs de l'aside (structure attendue par
+   Vuexy) ; le menu est le seul élément qui se rétrécit et défile, le pied de
+   sidebar ne se comprime jamais.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1) Zone de menu : seul élément qui se rétrécit et défile.
+      min-height:0 est indispensable — sans lui, un élément flex ne descend
+      jamais sous la hauteur de son contenu (min-height:auto) et le menu
+      déborderait de l'aside (qui est en overflow:hidden), masquant à nouveau
+      le pied de sidebar quand le menu est long ou l'écran petit.
+   -------------------------------------------------------------------------- */
+#layout-menu.menu-vertical > .menu-inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  /* Annule core.css:24408 « .menu-inner { height: 100% } ». Sans cela le menu
+     réclame toute la hauteur de l'aside et ne laisse aucune place au pied. */
+  height: auto;
+  /* INDISPENSABLE : sans défilement, un menu plus haut que l'espace disponible
+     déborde de son <ul> et se dessine PAR-DESSUS le bloc Déconnexion (le
+     chevauchement observé sur les écrans peu hauts). Avec overflow-y:auto il
+     défile proprement et le pied reste intact.
+     Si perfect-scrollbar est actif (src/assets/vendor/js/menu.js), sa règle
+     « overflow:hidden !important » l'emporte et c'est lui qui gère le
+     défilement : les deux mécanismes se relaient, il n'y en a jamais aucun. */
+  overflow-x: hidden;
+  /* !important assumé : perfect-scrollbar applique « overflow:hidden !important »
+     sur les éléments qu'il gère (vendor/libs/perfect-scrollbar/perfect-scrollbar.css).
+     Sans !important, sa règle l'emporte ; et si sa hauteur de référence est
+     périmée (calculée sur une fenêtre plus haute), il ne défile pas non plus et
+     le menu déborde à nouveau sur le pied. Le défilement natif, lui, est
+     toujours juste. */
+  overflow-y: auto !important;
+  /* Barre de défilement masquée, mécanisme conservé : la molette, le pavé
+     tactile, le clavier et le glissement au doigt continuent de fonctionner
+     normalement. On retire seulement l'ascenseur natif, qui jurait avec la
+     sidebar du thème. */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* anciens Edge / IE */
+}
+
+/* Chrome, Edge, Safari, Opera : la largeur nulle suffit à masquer l'ascenseur
+   sans désactiver le défilement (contrairement à display:none sur certains
+   moteurs, qui peut aussi neutraliser la molette). */
+#layout-menu.menu-vertical > .menu-inner::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* --------------------------------------------------------------------------
+   2) Pied de sidebar : jamais compressé, toujours collé en bas.
+      margin-top:auto sert de filet de sécurité si le menu ne grandit pas.
+   -------------------------------------------------------------------------- */
+#layout-menu .menu-bottom {
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding: 0.5rem 0 0.75rem;
+  /* Filet de séparation neutre : lisible sur fond clair comme sur fond sombre */
+  border-top: 1px solid rgba(127, 127, 127, 0.25);
+  /* Ceinture et bretelles : même si un élément du menu parvenait encore à
+     déborder de son <ul>, il passerait DERRIÈRE ce bloc et non par-dessus.
+     Le fond hérité de l'aside (.bg-menu-theme) le rend opaque, en thème clair
+     comme en thème sombre. */
+  position: relative;
+  z-index: 2;
+  background-color: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   3) Bouton de déconnexion.
+      C'est un <button> dans un <form method="post"> (voir la note sécurité
+      dans vertical_menu.html), mais il doit se voir et se comporter comme un
+      élément de menu Vuexy classique : on neutralise le style natif du bouton
+      et on reprend les métriques de « .menu-vertical .menu-item .menu-link ».
+      La couleur du texte n'est PAS forcée : elle est héritée de
+      « .bg-menu-theme .menu-link », ce qui garde le thème clair ET sombre.
+   -------------------------------------------------------------------------- */
+#layout-menu .menu-logout-form {
+  margin: 0;
+}
+
+#layout-menu .menu-logout-link {
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  width: calc(100% - 1.5rem);
+  margin: 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  min-height: 38px;
+  border-radius: 0.375rem;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.467;
+  text-align: left;
+  cursor: pointer;
+}
+
+#layout-menu .menu-logout-link > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.467;
+}
+
+/* Survol / focus : même teinte de fond que les autres éléments de menu
+   (theme-default.css:1514) + couleur primaire AIRPLUS sur le libellé. */
+#layout-menu .menu-logout-link:hover,
+#layout-menu .menu-logout-link:focus-visible {
+  background-color: rgba(128, 128, 128, 0.14);
+  color: #1060a0;
+}
+
+#layout-menu .menu-logout-link:focus-visible {
+  outline: 2px solid #1060a0;
+  outline-offset: -2px;
+}
+
+/* --------------------------------------------------------------------------
+   4) Menu replié (mode « collapsed », ≥ 1200px).
+      On reproduit exactement ce que core.css:25384+ fait pour les items de
+      menu : libellé masqué, icône centrée sans marge droite.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1200px) {
+  .layout-menu-collapsed:not(.layout-menu-hover):not(.layout-menu-offcanvas):not(.layout-menu-fixed-offcanvas)
+    #layout-menu.menu-vertical
+    .menu-logout-link
+    > div {
+    opacity: 0;
+  }
+
+  .layout-menu-collapsed:not(.layout-menu-hover):not(.layout-menu-offcanvas):not(.layout-menu-fixed-offcanvas)
+    #layout-menu.menu-vertical
+    .menu-logout-link
+    .menu-icon {
+    margin-right: 0;
+    text-align: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5) État actif du menu aux couleurs AIRPLUS.
+      L'état actif était jusqu'ici inopérant (comparaison impossible dans
+      menu_link_template.html) : maintenant qu'il fonctionne, on remplace le
+      dégradé violet par défaut de Vuexy (theme-default.css:1453) par le bleu
+      primaire du projet.
+   -------------------------------------------------------------------------- */
+#layout-menu.bg-menu-theme.menu-vertical .menu-item.active > .menu-link:not(.menu-toggle) {
+  background: linear-gradient(270deg, rgba(16, 96, 160, 0.7) 0%, #1060a0 100%);
+  box-shadow: 0 2px 6px 0 rgba(16, 96, 160, 0.3);
+  color: #fff !important;
+}

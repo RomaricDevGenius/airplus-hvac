@@ -1,0 +1,213 @@
+{% extends layout_path %}
+{% load i18n %}
+
+{% block title %}Audit & Logs – Back-office{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">Audit &amp; Logs</h4>
+    <small class="text-muted">Qui a fait quoi, quand, et sur quoi.</small>
+  </div>
+</div>
+
+{% comment %}
+  Filtres : formulaire en méthode GET, donc « rechargeable » et partageable par URL.
+  Le bouton « Réinitialiser » pointe simplement vers la page sans paramètre.
+{% endcomment %}
+<div class="card mb-4">
+  <div class="card-body">
+    {% comment %}
+      align-items-start et non -end : la colonne Recherche est plus haute que les
+      autres (elle porte une ligne d'aide), et un alignement par le bas ferait
+      remonter son libellé au-dessus des quatre autres.
+      Largeurs sur grand écran : 3 + 3 + 2 + 2 + 2 = 12, les cinq champs tiennent
+      donc sur une seule ligne au lieu de renvoyer « Au » à la ligne suivante.
+    {% endcomment %}
+    <form method="get" class="row g-3 align-items-start">
+      <div class="col-12 col-lg-3">
+        <label class="form-label" for="{{ filtres.q.id_for_label }}">Recherche</label>
+        {{ filtres.q }}
+        <div class="form-text">Cherche dans le nom de l'auteur et le libellé de l'objet.</div>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <label class="form-label" for="{{ filtres.auteur.id_for_label }}">Auteur</label>
+        {{ filtres.auteur }}
+      </div>
+      <div class="col-12 col-sm-6 col-lg-2">
+        <label class="form-label" for="{{ filtres.action.id_for_label }}">Action</label>
+        {{ filtres.action }}
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label" for="{{ filtres.debut.id_for_label }}">Du</label>
+        {{ filtres.debut }}
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label" for="{{ filtres.fin.id_for_label }}">Au</label>
+        {{ filtres.fin }}
+      </div>
+      <div class="col-12 d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-filter me-1"></i>Filtrer
+        </button>
+        {% if filtres_actifs %}
+        <a href="{% url 'gestion:audit-list' %}" class="btn btn-outline-secondary">
+          <i class="ti ti-filter-off me-1"></i>Réinitialiser
+        </a>
+        {% endif %}
+      </div>
+      {% if filtres.errors %}
+      <div class="col-12">
+        <div class="alert alert-warning mb-0" role="alert">
+          <i class="ti ti-alert-triangle me-1"></i>
+          {% for champ, erreurs in filtres.errors.items %}
+            {% for erreur in erreurs %}{{ erreur }} {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <h5 class="mb-0">Journal</h5>
+    <span class="badge bg-label-primary">
+      {{ page_obj.paginator.count }} entrée{{ page_obj.paginator.count|pluralize }} trouvée{{ page_obj.paginator.count|pluralize }}
+    </span>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle audit-table">
+        <thead>
+          <tr>
+            <th style="white-space: nowrap;">Date et heure</th>
+            <th>Auteur</th>
+            <th>Action</th>
+            <th>Objet concerné</th>
+            <th>Ce qui a changé</th>
+            <th class="text-end">Détail</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in entrees %}
+          <tr>
+            <td style="white-space: nowrap;">{{ e.created_at|date:"d/m/Y H:i" }}</td>
+            <td class="audit-col-auteur">
+              <span class="audit-ligne" title="{{ e.actor_label|default:'Système' }}">{{ e.actor_label|default:"Système" }}</span>
+              {% if e.compte_supprime %}
+              <span class="badge bg-label-secondary ms-1" title="Ce compte n'existe plus : le nom conservé est celui du jour de l'action.">compte supprimé</span>
+              {% endif %}
+            </td>
+            <td style="white-space: nowrap;">
+              <span class="badge {{ e.pastille }}"><i class="{{ e.icone }} me-1"></i>{{ e.get_action_display }}</span>
+            </td>
+            <td class="audit-col-objet">
+              {% if e.object_repr %}
+                <span class="audit-ligne" title="{{ e.object_repr }}">{{ e.object_repr }}</span>
+                {% if e.content_type %}<small class="audit-ligne text-muted">{{ e.content_type.name|capfirst }}</small>{% endif %}
+              {% elif e.content_type %}
+                <span class="audit-ligne text-muted">{{ e.content_type.name|capfirst }}</span>
+              {% else %}
+                <span class="text-muted">–</span>
+              {% endif %}
+            </td>
+            <td class="audit-col-change">
+              {% if e.resume %}
+                <span class="audit-ligne small" title="{{ e.resume }}">{{ e.resume }}</span>
+              {% else %}
+                <span class="text-muted">–</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <a href="{% url 'gestion:audit-detail' e.pk %}{% if retour %}?{{ retour }}{% endif %}"
+                 class="btn btn-sm btn-icon btn-outline-primary" title="Voir le détail">
+                <i class="ti ti-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+              {% if filtres_actifs %}
+                Aucune entrée ne correspond à ces critères.
+              {% else %}
+                Le journal est vide pour le moment.
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% comment %}
+      Pagination : chaque lien recolle « parametres » (tous les filtres actifs
+      sauf « page »). Sans cela, passer à la page 2 effacerait les filtres.
+    {% endcomment %}
+    {% if page_obj.paginator.count > 0 %}
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 mt-3 pt-3 border-top">
+      <p class="text-muted small mb-0">
+        Affichage {{ page_obj.start_index }}–{{ page_obj.end_index }} sur {{ page_obj.paginator.count }} entrée{{ page_obj.paginator.count|pluralize }}
+      </p>
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav aria-label="Pagination du journal d'audit">
+        <ul class="pagination pagination-sm mb-0">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if parametres %}&amp;{{ parametres }}{% endif %}" aria-label="Précédent">
+              <i class="ti ti-chevron-left"></i>
+            </a>
+          </li>
+          {% endif %}
+          <li class="page-item disabled">
+            <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+          </li>
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if parametres %}&amp;{{ parametres }}{% endif %}" aria-label="Suivant">
+              <i class="ti ti-chevron-right"></i>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  /* --------------------------------------------------------------------------
+     Tenue du tableau sur les écrans étroits.
+
+     Le conteneur .table-responsive ne suffit pas : par défaut un <table>
+     COMPRIME ses colonnes pour tenir dans la place disponible plutôt que de la
+     déborder. Le défilement horizontal ne se déclenche donc jamais, et chaque
+     cellule s'empile sur cinq ou six lignes (constaté sur écran de portable).
+
+     En imposant une largeur minimale au tableau, on l'oblige à déborder : c'est
+     alors .table-responsive qui prend le relais et fait défiler horizontalement,
+     en gardant chaque ligne lisible d'un seul tenant.
+     -------------------------------------------------------------------------- */
+  .audit-table { min-width: 1000px; }
+
+  /* Chaque cellule longue tient sur UNE ligne, coupée par des points de
+     suspension. Le texte complet reste accessible au survol (attribut title)
+     et dans la page de détail. */
+  .audit-table .audit-ligne {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Largeurs plafonds : sans elles, une seule cellule très longue étirerait sa
+     colonne et écraserait toutes les autres. */
+  .audit-table .audit-col-auteur { max-width: 220px; }
+  .audit-table .audit-col-objet  { max-width: 320px; }
+  .audit-table .audit-col-change { max-width: 260px; }
+</style>
+{% endblock %}

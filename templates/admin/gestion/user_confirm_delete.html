@@ -19,7 +19,12 @@
     </p>
     <form method="post">
       {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Supprimer</button>
+      {% comment %}
+        Page de repli sans JavaScript (décision client) : la page EST la confirmation.
+        src/assets/js/airplus-forms.js ajoute le spinner et le verrou anti double-clic
+        quand le JavaScript est disponible.
+      {% endcomment %}
+      <button type="submit" class="btn btn-danger" data-airplus-loading-text="Suppression…">Supprimer</button>
       <a href="{% url 'gestion:user-list' %}" class="btn btn-outline-secondary">Annuler</a>
     </form>
   </div>

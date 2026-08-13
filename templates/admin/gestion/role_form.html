@@ -20,11 +20,23 @@
           {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>{% endif %}
         </div>
         <div class="col-12">
-          <label class="form-label d-block mb-2">Permissions</label>
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <label class="form-label d-block mb-0">Permissions</label>
+            {% comment %}
+              type="button" est indispensable : sans lui, un bouton dans un
+              formulaire vaut submit et enregistrerait le rôle au premier clic.
+            {% endcomment %}
+            <button type="button" class="btn btn-outline-primary btn-sm js-toggle-all">
+              <i class="ti ti-checks me-1"></i><span>Tout sélectionner</span>
+            </button>
+          </div>
           <p class="text-muted small mb-3">Cliquez sur une permission pour la sélectionner ou la désélectionner.</p>
           {% for section_name, perms_list in permissions_grouped %}
-          <div class="mb-4">
-            <h6 class="text-uppercase text-muted small fw-semibold mb-2 pb-1 border-bottom">{{ section_name }}</h6>
+          <div class="mb-4 permission-section">
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-2 pb-1 border-bottom">
+              <h6 class="text-uppercase text-muted small fw-semibold mb-0">{{ section_name }}</h6>
+              <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none js-toggle-section">Tout</button>
+            </div>
             <div class="row g-1 g-md-2">
               {% for perm, label in perms_list %}
               <div class="col-6 col-md-4 col-lg-3 col-xl-2">
@@ -45,7 +57,11 @@
           {% if form.permissions.errors %}<div class="invalid-feedback d-block mt-2">{{ form.permissions.errors.0 }}</div>{% endif %}
         </div>
         <div class="col-12 pt-2">
-          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          {% comment %}
+            Spinner et blocage du double clic gérés par src/assets/js/airplus-forms.js
+            (automatique sur tout <form method="post">) : seul le texte d'attente est précisé.
+          {% endcomment %}
+          <button type="submit" class="btn btn-primary" data-airplus-loading-text="Enregistrement…">Enregistrer</button>
           <a href="{% url 'gestion:role-list' %}" class="btn btn-outline-secondary">Annuler</a>
         </div>
       </div>
@@ -64,27 +80,91 @@
 </style>
 
 <script>
-(function() {
-  document.querySelectorAll('.permission-card').forEach(function(card) {
-    card.addEventListener('click', function(e) {
-      e.preventDefault();
-      var checkbox = this.querySelector('.permission-checkbox');
-      var checkEl = this.querySelector('.permission-check');
-      if (!checkbox) return;
-      checkbox.checked = !checkbox.checked;
-      this.classList.toggle('permission-card-selected', checkbox.checked);
-      this.classList.toggle('border-success', checkbox.checked);
-      this.classList.toggle('bg-success', checkbox.checked);
-      this.classList.toggle('bg-opacity-10', checkbox.checked);
-      this.classList.toggle('border-secondary', !checkbox.checked);
-      var checkEl = this.querySelector('.permission-check');
-      if (checkbox.checked) {
-        if (checkEl) { checkEl.classList.remove('d-none'); checkEl.classList.add('d-inline-flex'); }
-      } else {
-        if (checkEl) { checkEl.classList.add('d-none'); checkEl.classList.remove('d-inline-flex'); }
+(function () {
+  // La case à cocher est masquée : c'est la carte qui porte l'état visible.
+  // Les trois (case, apparence de la carte, pastille ✓) doivent donc toujours
+  // être mis à jour ensemble — d'où cette fonction unique, utilisée aussi bien
+  // par le clic sur une carte que par les boutons « Tout ».
+  function appliquerEtat(carte, coche) {
+    var caseACocher = carte.querySelector('.permission-checkbox');
+    if (!caseACocher) return;
+    caseACocher.checked = coche;
+    carte.classList.toggle('permission-card-selected', coche);
+    carte.classList.toggle('border-success', coche);
+    carte.classList.toggle('bg-success', coche);
+    carte.classList.toggle('bg-opacity-10', coche);
+    carte.classList.toggle('border-secondary', !coche);
+    var pastille = carte.querySelector('.permission-check');
+    if (pastille) {
+      pastille.classList.toggle('d-none', !coche);
+      pastille.classList.toggle('d-inline-flex', coche);
+    }
+  }
+
+  function cartes(portee) {
+    return Array.prototype.slice.call(portee.querySelectorAll('.permission-card'));
+  }
+
+  function toutesCochees(liste) {
+    return liste.length > 0 && liste.every(function (c) {
+      var cb = c.querySelector('.permission-checkbox');
+      return cb && cb.checked;
+    });
+  }
+
+  var boutonGlobal = document.querySelector('.js-toggle-all');
+
+  // Les libellés suivent l'état réel : un bouton qui propose « Tout sélectionner »
+  // alors que tout est déjà coché serait trompeur.
+  function rafraichirLibelles() {
+    document.querySelectorAll('.js-toggle-section').forEach(function (bouton) {
+      var section = bouton.closest('.permission-section');
+      if (section) {
+        bouton.textContent = toutesCochees(cartes(section)) ? 'Aucune' : 'Tout';
       }
     });
+    if (boutonGlobal) {
+      var texte = boutonGlobal.querySelector('span');
+      if (texte) {
+        texte.textContent = toutesCochees(cartes(document))
+          ? 'Tout désélectionner'
+          : 'Tout sélectionner';
+      }
+    }
+  }
+
+  function basculer(liste) {
+    var cible = !toutesCochees(liste);
+    liste.forEach(function (c) { appliquerEtat(c, cible); });
+    rafraichirLibelles();
+  }
+
+  cartes(document).forEach(function (carte) {
+    carte.addEventListener('click', function (e) {
+      e.preventDefault();
+      var cb = this.querySelector('.permission-checkbox');
+      if (!cb) return;
+      appliquerEtat(this, !cb.checked);
+      rafraichirLibelles();
+    });
   });
+
+  document.querySelectorAll('.js-toggle-section').forEach(function (bouton) {
+    bouton.addEventListener('click', function () {
+      var section = this.closest('.permission-section');
+      if (section) basculer(cartes(section));
+    });
+  });
+
+  if (boutonGlobal) {
+    boutonGlobal.addEventListener('click', function () {
+      basculer(cartes(document));
+    });
+  }
+
+  // À l'ouverture d'un rôle existant, les libellés doivent déjà refléter
+  // les permissions déjà attribuées.
+  rafraichirLibelles();
 })();
 </script>
 {% endblock %}

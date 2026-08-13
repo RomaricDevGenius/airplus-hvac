@@ -30,31 +30,9 @@
           {% else %}
           <div class="{{container_class}} flex-grow-1 container-p-y">
             {% endif %}
-            {% if messages %}
-            <div class="mb-4 messages-container">
-              {% for message in messages %}
-              <div class="alert alert-{{ message.tags }} alert-dismissible alert-auto-hide" role="alert" data-bs-autohide="5000">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-              </div>
-              {% endfor %}
-            </div>
-            <script>
-            window.addEventListener('load', function() {
-              document.querySelectorAll('.alert-auto-hide[data-bs-autohide]').forEach(function(el) {
-                var ms = parseInt(el.getAttribute('data-bs-autohide'), 10) || 5000;
-                setTimeout(function() {
-                  if (typeof bootstrap !== 'undefined') {
-                    var b = bootstrap.Alert.getOrCreateInstance(el);
-                    if (b) b.close();
-                  } else {
-                    el.style.display = 'none';
-                  }
-                }, ms);
-              });
-            });
-            </script>
-            {% endif %}
+            {# Messages Django : balisage commun aux trois layouts (converti en toasts par le JS) #}
+            {% include "../layout/partials/messages.html" %}
+
             {% block content %}
             {% endblock content %}
 

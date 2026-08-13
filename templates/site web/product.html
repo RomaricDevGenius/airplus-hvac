@@ -418,6 +418,9 @@
 
     {% include "site web/includes/quote_drawer.html" %}
 
+    {% comment %}Messages Django (ajout au panier, erreurs…) + notifications partagées.{% endcomment %}
+    {% include "site web/includes/site_feedback.html" %}
+
     <!-- jQuery Plugins -->
     <script src="{% static 'site/js/jquery.min.js' %}"></script>
     <script src="{% static 'site/js/bootstrap.min.js' %}"></script>

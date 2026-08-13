@@ -10,7 +10,17 @@
     </li>
     {% endif %}
     <li>
-      <a href="{% url 'front:logout' %}" style="color: #333"><i class="fa fa-sign-out"></i> Déconnexion</a>
+      {% comment %}
+        Déconnexion en POST : un simple lien pouvait être déclenché par un
+        préchargement du navigateur ou une balise <img> hébergée ailleurs.
+        Le bouton est habillé pour rester visuellement identique au lien.
+      {% endcomment %}
+      <form method="post" action="{% url 'front:logout' %}" class="apf-logout-form">
+        {% csrf_token %}
+        <button type="submit" class="apf-logout-btn apf-logout-dropdown">
+          <i class="fa fa-sign-out"></i> Déconnexion
+        </button>
+      </form>
     </li>
   </ul>
 </li>
@@ -22,6 +32,36 @@
   <a href="{% url 'front:register' %}"><i class="fa fa-user-plus"></i> Inscription</a>
 </li>
 {% endif %}
+
+{% comment %}
+  Habillage du bouton de déconnexion pour qu'il se comporte comme le lien
+  Bootstrap 3 qu'il remplace dans le menu déroulant (bloc pleine largeur,
+  même retrait, même survol). Les règles de base (fond et bordure retirés)
+  viennent de includes/site_feedback.html, présent sur toutes ces pages.
+{% endcomment %}
+<style>
+  .dropdown-menu li .apf-logout-form {
+    display: block;
+  }
+  .dropdown-menu li .apf-logout-dropdown {
+    display: block;
+    width: 100%;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    text-align: left;
+    white-space: nowrap;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .dropdown-menu li .apf-logout-dropdown:hover {
+    color: #262626;
+    background-color: #f5f5f5;
+  }
+</style>
 
 <!-- Script pour forcer le dropdown à fonctionner -->
 <script>

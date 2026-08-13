@@ -57,14 +57,7 @@
                   name="groups"
                   value="{{ g.pk }}"
                   class="d-none role-checkbox"
-                  {%
-                  if
-                  g.pk
-                  in
-                  selected_group_ids
-                  %}checked{%
-                  endif
-                  %}
+                  {% if g.pk in selected_group_ids %}checked{% endif %}
                 />
                 <span class="role-label">{{ g.name }}</span>
                 <span
@@ -100,7 +93,11 @@
         </div>
         {% endif %}
         <div class="col-12">
-          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          {% comment %}
+            Spinner et blocage du double clic gérés par src/assets/js/airplus-forms.js
+            (automatique sur tout <form method="post">) : seul le texte d'attente est précisé.
+          {% endcomment %}
+          <button type="submit" class="btn btn-primary" data-airplus-loading-text="Enregistrement…">Enregistrer</button>
           <a href="{% url 'gestion:user-list' %}" class="btn btn-outline-secondary">Annuler</a>
         </div>
       </div>

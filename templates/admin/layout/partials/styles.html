@@ -40,8 +40,15 @@
 
 <link rel="stylesheet" href="{% static 'css/demo.css' %}" />
 
+<!-- Socle de notifications AIRPLUS (toasts, confirmations) : chargé AVANT airplus-admin.css
+     pour que nos surcharges maison passent en dernier. -->
+<link rel="stylesheet" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+
 <!-- AIRPLUS HVAC – couleurs personnalisées -->
 <link rel="stylesheet" href="{% static 'css/airplus-admin.css' %}" />
+
+<!-- AIRPLUS HVAC – sidebar : pied de menu et bouton de déconnexion -->
+<link rel="stylesheet" href="{% static 'css/airplus-sidebar.css' %}" />
 
 <!--Vendor CSS-->
 <link rel="stylesheet" href="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}" />

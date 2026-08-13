@@ -79,8 +79,28 @@ class ClientLoginView(LoginView):
 
 
 def client_logout_view(request):
-    """Déconnexion."""
+    """Déconnexion du site public.
+
+    Sécurité : seule une requête POST (donc protégée par le jeton CSRF via
+    CsrfViewMiddleware) déconnecte réellement. En GET, on se contente de
+    rediriger sans toucher à la session. Sans cela, un simple lien suffit à
+    déconnecter le visiteur : préchargement du navigateur, extension, ou
+    balise ``<img src="/deconnexion/">`` hébergée sur un site tiers. C'est
+    exactement la raison pour laquelle Django impose le POST sur ``LogoutView``
+    depuis la version 5.
+
+    Choix pour le cas GET : redirection douce plutôt qu'un 405, cohérente avec
+    ``gestion_logout_view`` du back-office. Un visiteur ayant gardé l'ancienne
+    URL en favori atterrit sur une page utile au lieu d'une page d'erreur, et
+    surtout sa session reste intacte — c'est le point important.
+    """
+    if request.method != "POST":
+        if request.user.is_authenticated:
+            return redirect("front:index")
+        return redirect("front:login")
+
     logout(request)
+    messages.success(request, "Vous êtes bien déconnecté. À bientôt !")
     return redirect(settings.LOGOUT_REDIRECT_URL or "front:index")
 
 
@@ -320,8 +340,12 @@ def cart_add(request):
     total_quantity = sum(cart.values())
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        # En AJAX, c'est la page appelante qui affiche sa propre notification.
         return JsonResponse({"ok": True, "cart_count": total_quantity})
 
+    # Envoi de formulaire classique (boutique, fiche produit) : sans message,
+    # l'utilisateur arrivait sur le panier sans rien pour confirmer son geste.
+    messages.success(request, f"« {product.designation} » a été ajouté à votre panier.")
     return redirect("front:cart_detail")
 
 
@@ -353,18 +377,33 @@ def cart_remove(request):
 
     cart = _get_cart(request.session)
     key = str(product_id)
+    removed = False
     if key in cart:
         new_qty = cart[key] + delta
         if new_qty > 0:
             cart[key] = new_qty
         else:
             cart.pop(key, None)
+            removed = True
         _save_cart(request.session, cart)
 
     total_quantity = sum(cart.values())
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         return JsonResponse({"ok": True, "cart_count": total_quantity})
+
+    # Envoi de formulaire classique : on confirme le retrait, en nommant le
+    # produit quand on arrive à le retrouver (le panier ne stocke qu'un id).
+    if removed:
+        label = None
+        try:
+            label = Product.objects.filter(pk=int(key)).values_list("designation", flat=True).first()
+        except (TypeError, ValueError):
+            label = None
+        if label:
+            messages.info(request, f"« {label} » a été retiré de votre panier.")
+        else:
+            messages.info(request, "L'article a été retiré de votre panier.")
 
     return redirect("front:cart_detail")
 

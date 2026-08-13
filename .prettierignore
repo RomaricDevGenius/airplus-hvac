@@ -1,0 +1,16 @@
+# Gabarits Django : ne JAMAIS les reformater automatiquement.
+#
+# Le lexer de Django ne franchit pas les retours à la ligne : une balise
+# {% ... %} ou {{ ... }} coupée en deux n'est plus interprétée. Elle est alors
+# affichée telle quelle à l'écran, ou fait planter la page — sans aucune erreur
+# au démarrage, ce qui rend le problème très difficile à repérer.
+#
+# Trois bugs sont déjà arrivés en production par ce biais :
+#   - templates/admin/gestion/register.html      -> erreur 500 sur /inscription/
+#   - templates/admin/gestion/user_form.html     -> les rôles n'apparaissaient
+#                                                   plus cochés, et étaient
+#                                                   effacés à l'enregistrement
+#   - templates/admin/gestion/product_list.html  -> balise affichée en clair
+#
+templates/
+apps/**/templates/

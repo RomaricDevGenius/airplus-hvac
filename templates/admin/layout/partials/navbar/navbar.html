@@ -154,10 +154,36 @@
               </li>
               <li><div class="dropdown-divider"></div></li>
               <li>
-                <a class="dropdown-item" href="{% url 'gestion:logout' %}">
-                  <i class="ti ti-logout me-3 ti-md"></i>
-                  <span class="align-middle">Déconnexion</span>
-                </a>
+                {% comment %}
+                  Déconnexion en POST + jeton CSRF : un lien GET permettrait à un
+                  préchargement de navigateur, une extension ou une balise
+                  <img src="..."> hébergée sur un site tiers de déconnecter
+                  l'utilisateur à son insu.
+                  Repère stable pour la vague 2 (confirmation) : l'id du formulaire
+                  et la classe js-logout-form commune aux deux formulaires.
+                {% endcomment %}
+                <form id="airplus-logout-form-navbar"
+                      class="airplus-logout-form js-logout-form m-0"
+                      method="post"
+                      action="{% url 'gestion:logout' %}">
+                  {% csrf_token %}
+                  {# .dropdown-item fournit width:100%, fond transparent et border:0 (core.css:3521) : rendu identique au lien. #}
+                  {% comment %}
+                    Confirmation de déconnexion : le bouton est déjà dans son <form method="post">,
+                    la règle 2 du socle soumet ce formulaire une fois la confirmation obtenue.
+                    Style « question » : ce n'est ni une destruction ni un changement de données.
+                    La structure, les classes et l'id du formulaire ne doivent pas bouger.
+                  {% endcomment %}
+                  <button type="submit" class="dropdown-item"
+                          data-airplus-confirm="Se déconnecter ?"
+                          data-airplus-confirm-text="Vous allez quitter le back-office. Toute saisie en cours qui n'a pas été enregistrée sera perdue."
+                          data-airplus-confirm-button="Oui, me déconnecter"
+                          data-airplus-confirm-cancel="Rester connecté"
+                          data-airplus-confirm-style="question">
+                    <i class="ti ti-logout me-3 ti-md"></i>
+                    <span class="align-middle">Déconnexion</span>
+                  </button>
+                </form>
               </li>
             </ul>
           </li>

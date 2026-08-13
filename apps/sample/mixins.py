@@ -40,12 +40,13 @@ MENU_PERMISSION_GROUPS = {
     "historique": ["catalog.view_stockmovement"],
     "user-list": ["accounts.view_user"],
     "role-list": ["auth.view_group"],
+    "audit-list": ["audit.view_auditlog"],
 }
 
 MENU_HEADER_ITEMS = {
     "Catalogue": ["product-list", "client-list", "quote-list"],
     "Activité": ["historique"],
-    "Administration": ["user-list", "role-list"],
+    "Administration": ["user-list", "role-list", "audit-list"],
 }
 
 

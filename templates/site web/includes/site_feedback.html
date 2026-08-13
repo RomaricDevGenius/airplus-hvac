@@ -1,0 +1,451 @@
+{% comment %}
+  RETOUR VISUEL PARTAGÉ DU SITE PUBLIC
+  ------------------------------------
+  Ce gabarit est inclus par toutes les pages publiques (elles sont autonomes :
+  aucune n'hérite d'un layout commun). Il apporte deux choses :
+
+    1. L'AFFICHAGE DES MESSAGES DJANGO (messages.success / warning / error…).
+       Ils sont rendus côté serveur, directement visibles : ils s'affichent donc
+       même si le JavaScript ne se charge pas (connexion lente, JS bloqué).
+       Le JavaScript ne fait qu'ajouter la disparition automatique.
+
+    2. DEUX OUTILS RÉUTILISABLES, exposés en global :
+         - window.airplusToast(type, titre, message)  → notification
+           (alias historique : window.showToast / window.closeToast, utilisés
+            par les scripts de l'accueil)
+         - toute balise <form data-confirm="Question ?"> demande confirmation
+           avant l'envoi. Sans JavaScript, le formulaire s'envoie normalement :
+           la confirmation est un confort, jamais un blocage.
+
+  Contraintes respectées : aucune dépendance à Bootstrap (les versions varient
+  d'une page à l'autre : 3.3.7 ici, 5.3.3 là), aucune dépendance à jQuery,
+  aucune icône Font Awesome (les pages mélangent FA4 et FA6), aucune variable
+  CSS de l'accueil et aucune balise "url" : l'include est utilisable tel quel
+  dans n'importe quelle page, connectée ou non.
+{% endcomment %}
+
+<div id="apf-toasts" class="apf-toasts" aria-live="polite" aria-atomic="false">
+  {% if messages %}{% for message in messages %}
+  <div class="apf-toast apf-show apf-{{ message.tags|default:'info' }}" role="status">
+    <span class="apf-ico" aria-hidden="true">{% if 'success' in message.tags %}&#10003;{% elif 'danger' in message.tags or 'error' in message.tags %}&#10005;{% elif 'warning' in message.tags %}!{% else %}i{% endif %}</span>
+    <div class="apf-body">
+      <div class="apf-title">{% if 'success' in message.tags %}Opération réussie{% elif 'danger' in message.tags or 'error' in message.tags %}Une erreur est survenue{% elif 'warning' in message.tags %}Attention{% else %}Information{% endif %}</div>
+      <div class="apf-msg">{{ message }}</div>
+    </div>
+    <button type="button" class="apf-close" aria-label="Fermer la notification" onclick="apfCloseToast(this)">&times;</button>
+  </div>
+  {% endfor %}{% endif %}
+</div>
+
+{% comment %}
+  Boîte de confirmation. Masquée par défaut (hidden + display:none) : sans
+  JavaScript elle n'apparaît jamais et ne gêne donc pas la mise en page.
+{% endcomment %}
+<div id="apf-confirm" class="apf-confirm" hidden>
+  <div class="apf-confirm-backdrop" data-apf-cancel></div>
+  <div class="apf-confirm-card" role="dialog" aria-modal="true" aria-labelledby="apf-confirm-text">
+    <div class="apf-confirm-icon" aria-hidden="true">!</div>
+    <p class="apf-confirm-text" id="apf-confirm-text"></p>
+    <div class="apf-confirm-actions">
+      <button type="button" class="apf-btn apf-btn-ghost" data-apf-cancel>Annuler</button>
+      <button type="button" class="apf-btn apf-btn-danger" id="apf-confirm-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ── PILE DE NOTIFICATIONS (bas-droite, comme sur l'accueil) ───────── */
+  .apf-toasts {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10500;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    pointer-events: none;
+    max-width: 92vw;
+  }
+  .apf-toast {
+    position: relative;
+    box-sizing: border-box;
+    min-width: 260px;
+    max-width: 340px;
+    background: #ffffff;
+    border: 1px solid #e6e8ee;
+    border-left: 3px solid #9aa3b2;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+    padding: 12px 34px 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-family: 'Montserrat', Arial, sans-serif;
+    transform: translateX(120%);
+    opacity: 0;
+    transition:
+      transform 0.3s ease-out,
+      opacity 0.3s ease-out;
+    pointer-events: auto;
+  }
+  .apf-toast.apf-show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .apf-toast .apf-ico {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: inline-block;
+    text-align: center;
+    line-height: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 50%;
+    background: #eef0f4;
+    color: #55606f;
+  }
+  .apf-toast .apf-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .apf-toast .apf-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #1e1f29;
+    margin-bottom: 2px;
+  }
+  .apf-toast .apf-msg {
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #5a6270;
+    word-wrap: break-word;
+  }
+  .apf-toast .apf-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
+    font-size: 18px;
+    color: #9aa3b2;
+    cursor: pointer;
+  }
+  .apf-toast .apf-close:hover {
+    color: #1e1f29;
+  }
+
+  /* Couleurs par niveau (tags Django : success / danger / warning / info) */
+  .apf-toast.apf-success {
+    border-left-color: #2e7d32;
+  }
+  .apf-toast.apf-success .apf-ico {
+    background: #e7f4e8;
+    color: #2e7d32;
+  }
+  .apf-toast.apf-danger,
+  .apf-toast.apf-error {
+    border-left-color: #c62828;
+  }
+  .apf-toast.apf-danger .apf-ico,
+  .apf-toast.apf-error .apf-ico {
+    background: #fdeaea;
+    color: #c62828;
+  }
+  .apf-toast.apf-warning {
+    border-left-color: #ef8f00;
+  }
+  .apf-toast.apf-warning .apf-ico {
+    background: #fff4e0;
+    color: #b26a00;
+  }
+  .apf-toast.apf-info,
+  .apf-toast.apf-secondary {
+    border-left-color: #1060a0;
+  }
+  .apf-toast.apf-info .apf-ico,
+  .apf-toast.apf-secondary .apf-ico {
+    background: #e6f0fa;
+    color: #1060a0;
+  }
+
+  @media (max-width: 560px) {
+    .apf-toasts {
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      align-items: stretch;
+    }
+    .apf-toast {
+      max-width: 100%;
+      min-width: 0;
+    }
+  }
+
+  /* ── BOÎTE DE CONFIRMATION ─────────────────────────────────────────── */
+  .apf-confirm[hidden] {
+    display: none;
+  }
+  .apf-confirm {
+    position: fixed;
+    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+  }
+  .apf-confirm-backdrop {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(8, 8, 18, 0.55);
+  }
+  .apf-confirm-card {
+    position: relative;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 400px;
+    padding: 26px 24px 20px;
+    text-align: center;
+    font-family: 'Montserrat', Arial, sans-serif;
+    box-sizing: border-box;
+  }
+  .apf-confirm-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: #fdeaea;
+    color: #c62828;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 52px;
+  }
+  .apf-confirm-text {
+    font-size: 14.5px;
+    color: #1e1f29;
+    line-height: 1.55;
+    margin: 0 0 22px;
+  }
+  .apf-confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .apf-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+  .apf-btn-ghost {
+    background: #f1f2f5;
+    color: #55606f;
+  }
+  .apf-btn-ghost:hover {
+    background: #e4e6eb;
+  }
+  .apf-btn-danger {
+    background: #c62828;
+    color: #fff;
+  }
+  .apf-btn-danger:hover {
+    background: #a81f1f;
+  }
+
+  /* ── DÉCONNEXION EN POST ───────────────────────────────────────────
+     Le lien « Déconnexion » est devenu un formulaire POST (protection
+     CSRF). Ces règles rendent le bouton visuellement identique au lien
+     qu'il remplace : aucune bordure, aucun fond, la typographie et la
+     couleur du contexte. Chaque page affine ensuite si nécessaire. */
+  .apf-logout-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+  }
+  .apf-logout-btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    line-height: inherit;
+    text-align: inherit;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  (function () {
+    'use strict';
+
+    var STACK_ID = 'apf-toasts';
+    var AUTO_CLOSE_MS = 6500;
+
+    function stack() {
+      return document.getElementById(STACK_ID);
+    }
+
+    /* Fermeture : on retire la classe d'affichage puis l'élément après la transition. */
+    function hideToast(el) {
+      if (!el || el.getAttribute('data-apf-closing') === '1') return;
+      el.setAttribute('data-apf-closing', '1');
+      el.classList.remove('apf-show');
+      setTimeout(function () {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 350);
+    }
+
+    /* Appelée par le bouton × de chaque notification (attribut onclick). */
+    window.apfCloseToast = function (btn) {
+      hideToast(btn && btn.closest ? btn.closest('.apf-toast') : null);
+    };
+
+    function programAutoClose(el) {
+      setTimeout(function () {
+        hideToast(el);
+      }, AUTO_CLOSE_MS);
+    }
+
+    /*
+      Affiche une notification depuis le JavaScript.
+      type : 'success' | 'error' | 'danger' | 'warning' | 'info'
+    */
+    window.airplusToast = function (type, title, msg) {
+      var host = stack();
+      if (!host) return;
+      var kind = type || 'info';
+      if (kind === 'error') kind = 'danger';
+
+      var el = document.createElement('div');
+      el.className = 'apf-toast apf-' + kind;
+
+      var ico = document.createElement('span');
+      ico.className = 'apf-ico';
+      ico.setAttribute('aria-hidden', 'true');
+      ico.textContent = kind === 'success' ? '✓' : kind === 'danger' ? '✕' : kind === 'warning' ? '!' : 'i';
+
+      var body = document.createElement('div');
+      body.className = 'apf-body';
+      var t = document.createElement('div');
+      t.className = 'apf-title';
+      t.textContent = title || '';
+      var m = document.createElement('div');
+      m.className = 'apf-msg';
+      m.textContent = msg || '';
+      body.appendChild(t);
+      body.appendChild(m);
+
+      var close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'apf-close';
+      close.setAttribute('aria-label', 'Fermer la notification');
+      close.innerHTML = '&times;';
+      close.onclick = function () {
+        hideToast(el);
+      };
+
+      el.appendChild(ico);
+      el.appendChild(body);
+      el.appendChild(close);
+      host.appendChild(el);
+
+      /* Reflow forcé pour que la transition d'entrée soit visible. */
+      void el.offsetWidth;
+      el.classList.add('apf-show');
+      programAutoClose(el);
+      return el;
+    };
+
+    /* Alias historiques : l'accueil appelait showToast()/closeToast(). */
+    window.showToast = window.airplusToast;
+    window.closeToast = function () {
+      var host = stack();
+      if (!host) return;
+      var all = host.querySelectorAll('.apf-toast');
+      if (all.length) hideToast(all[all.length - 1]);
+    };
+
+    /* Disparition automatique des messages rendus par le serveur. */
+    var served = stack() ? stack().querySelectorAll('.apf-toast') : [];
+    for (var i = 0; i < served.length; i++) programAutoClose(served[i]);
+
+    /* ── CONFIRMATION AVANT ENVOI D'UN FORMULAIRE ───────────────────── */
+    var box = document.getElementById('apf-confirm');
+    var boxText = document.getElementById('apf-confirm-text');
+    var boxOk = document.getElementById('apf-confirm-ok');
+    var pending = null;
+
+    function closeBox() {
+      if (!box) return;
+      box.hidden = true;
+      pending = null;
+    }
+
+    /*
+      Affiche la boîte de confirmation.
+      question : texte affiché ; labelOk : libellé du bouton ; onOk : callback.
+    */
+    window.airplusConfirm = function (question, labelOk, onOk) {
+      if (!box || !boxText || !boxOk) {
+        /* Repli : confirmation native du navigateur. */
+        if (window.confirm(question)) onOk();
+        return;
+      }
+      boxText.textContent = question;
+      boxOk.textContent = labelOk || 'Confirmer';
+      pending = onOk;
+      box.hidden = false;
+      setTimeout(function () {
+        boxOk.focus();
+      }, 30);
+    };
+
+    if (box) {
+      var cancels = box.querySelectorAll('[data-apf-cancel]');
+      for (var c = 0; c < cancels.length; c++) cancels[c].addEventListener('click', closeBox);
+      boxOk.addEventListener('click', function () {
+        var cb = pending;
+        closeBox();
+        if (cb) cb();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !box.hidden) closeBox();
+      });
+    }
+
+    /*
+      Tout <form data-confirm="..."> demande confirmation avant envoi.
+      Sans JavaScript, cet écouteur n'existe pas : le formulaire part
+      directement, le parcours reste donc fonctionnel.
+    */
+    document.addEventListener('submit', function (e) {
+      var form = e.target;
+      if (!form || form.nodeName !== 'FORM' || !form.getAttribute) return;
+      var question = form.getAttribute('data-confirm');
+      if (!question || form.getAttribute('data-apf-confirmed') === '1') return;
+      e.preventDefault();
+      window.airplusConfirm(question, form.getAttribute('data-confirm-ok'), function () {
+        form.setAttribute('data-apf-confirmed', '1');
+        HTMLFormElement.prototype.submit.call(form);
+      });
+    });
+  })();
+</script>
