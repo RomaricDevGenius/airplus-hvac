@@ -40,11 +40,23 @@
   "prettier.requireConfig": true,
   "prettier.configPath": ".prettierrc.json",
   "prettier.ignorePath": ".prettierignore",
+  // Gabarits Django : formatage automatique DESACTIVE.
+  // Le lexer de Django ne franchit pas les retours a la ligne : une balise
+  // {% ... %} ou {{ ... }} coupee en deux n'est plus interpretee. Elle est
+  // alors affichee telle quelle a l'ecran, ou fait planter la page — sans
+  // aucune erreur au demarrage, ce qui rend le probleme tres difficile a voir.
+  // Trois bugs sont deja partis en production par ce biais :
+  //   register.html   -> erreur 500 sur /inscription/
+  //   user_form.html  -> les roles n'etaient plus coches, et etaient effaces
+  //   product_list.html -> balise affichee en clair
+  // Le formatage reste actif pour Python (Black), JS, CSS, JSON et Markdown.
   "[html]": {
-    "editor.defaultFormatter": "HookyQR.beautify"
+    "editor.defaultFormatter": "HookyQR.beautify",
+    "editor.formatOnSave": false
   },
   "[django-html]": {
-    "editor.defaultFormatter": "HookyQR.beautify"
+    "editor.defaultFormatter": "HookyQR.beautify",
+    "editor.formatOnSave": false
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
